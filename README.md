@@ -1,2 +1,3 @@
-# CSCI6550-FP
-Final Project for Artificial Intelligence
+# CSCI6550_FP
+
+Developed with Unreal Engine 4
