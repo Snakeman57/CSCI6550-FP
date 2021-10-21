@@ -3,34 +3,33 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "People.generated.h"
 
 struct Traits {
 	float a; // 
+	Traits operator += (Traits& other);
+	Traits operator /= (int& div);
 };
-UCLASS()
-class CSCI6550_FP_API UPeople : public UObject {
-	GENERATED_BODY()
+class CSCI6550_FP_API People {
 public:
-	UPeople();
-	UPeople(int inId, int locs);
-	~UPeople();
-	void set(UPeople& p); // set the UPeople b/c compiler bitched about "UPopulation.head->ppl = item;"
+	People();
+	People(int inId, int locs);
+	~People();
 	void act();
 	int getID() const;
 	int getLoc() const;
-	bool operator == (UPeople& other) const;
+	Traits getT() const;
+	bool operator == (People& other) const;
 private:
 	int id; // unique id for searches
 	int pop; // integer representing population
-	Traits traits; // the traits for this UPeople (see struct above)
+	Traits traits; // the traits for this People (see struct above)
 	float supply; 
 	int loc; // location index
 	void move();
 	void interact();
-	void trade(UPeople *&other);
-	void war(UPeople *&other);
-	void merge(UPeople*& other);
+	void trade(People *&other);
+	void war(People *&other);
+	void merge(People*& other);
 	void getSupply();
 	void eat();
 	void reproduce();

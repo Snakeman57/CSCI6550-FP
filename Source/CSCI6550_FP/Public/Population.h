@@ -4,25 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "People.h"
-#include "Population.generated.h"
 
-struct FPopNode {
-	UPeople ppl;
-	FPopNode* nxt;
+struct Node {
+	People ppl;
+	Node* nxt;
 };
-UCLASS()
-class CSCI6550_FP_API UPopulation : public UObject {
-	GENERATED_BODY()
+class CSCI6550_FP_API Population {
 public:
-	UPopulation();
-	~UPopulation();
-	void in(UPeople& item); // insert
-	void del(UPeople& item); // delete
+	Population();
+	~Population();
+	void in(People& item); // insert
+	void del(People& item); // delete
 	int length() const; // public access to length
 	void randomOrder(); // randomizes the order of the list so ppl don't have bis for being early/late in it
+	Traits avgT(); // average trait vaules across population
 private:
-	FPopNode* head; // first pop
+	Node* head; // first pop
 	int ln; // length
-	void findItem(FPopNode*& ploc, FPopNode*& loc, bool& found, UPeople &item);
-	void swap(FPopNode*& a, FPopNode*& b);
+	void findItem(Node*& ploc, Node*& loc, bool& found, People &item);
+	void swap(Node*& a, Node*& b);
 };

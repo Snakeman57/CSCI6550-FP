@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Population.h"
-#include "TheWorld.generated.h"
 
 enum Biomes {
 	biome1,
@@ -34,20 +33,33 @@ struct Location {
 	Weathers weather; // weather
 	float supply; // supply
 };
-UCLASS()
-class CSCI6550_FP_API UTheWorld : public UObject {
-	GENERATED_BODY()
+struct WorldInfo {
+	int locations; // number of locations
+	int lat1, lat2; // lattitude range
+	int biomes[Biomes::MAX_BIOM]; // number of each biomme
+	float avgSupply; // average supply value
+};
+struct PopInfo {
+	int extant;
+	int extinct;
+	Traits avg;
+};
+class CSCI6550_FP_API TheWorld {
 public:
-	UTheWorld();
-	UTheWorld(int lat1, int lat2, int size, int pop);
-	~UTheWorld();
+	TheWorld();
+	TheWorld(int lat1, int lat2, int size, int pop);
+	~TheWorld();
 	void init(int lat1, int lat2, int size, int pop);
 	void updtSupply(); // moves supply in each location towards base
 	void updtWeather(); // changes the weather in each location based on Weather.chance
+	WorldInfo getWstats();
+	PopInfo getPstats();
 private:
 	Biome biomes[Biomes::MAX_BIOM];
 	Weather weathers[Weathers::MAX_WTHR];
 	Location* l; // dynamically allocate an array
-	UPopulation p; // population of ppls
+	WorldInfo info;
+	Population p; // population of ppls
+	int cID; // current uniquie id value to apply to People creation
 	Biomes getBiome(int lat);
 };

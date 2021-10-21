@@ -3,16 +3,16 @@
 #include "TheWorld.h"
 #include <random>
 
-UTheWorld::UTheWorld() { // default numbers, DO NOT CALL
+TheWorld::TheWorld() : cID(0) { // default numbers, DO NOT CALL
 	init(-100, 100, 100, 20);
 }
-UTheWorld::UTheWorld(int lat1, int lat2, int size, int pop) { // actual cxn
+TheWorld::TheWorld(int lat1, int lat2, int size, int pop) : cID(0) { // actual cxn
 	init(lat1, lat2, size, pop);
 }
-UTheWorld::~UTheWorld() { // dxn
+TheWorld::~TheWorld() { // dxn
 		delete l; // deallocate the map - check if need to do neighbors seperately or if this is enough
 }
-void UTheWorld::init(int lat1, int lat2, int size, int pop) {
+void TheWorld::init(int lat1, int lat2, int size, int pop) {
 	l = new Location[size]; // synamically allocate the map from user specs
 	int * lats = new int[size]; // allocate temporary array
 	std::default_random_engine rngsus;
@@ -33,7 +33,21 @@ void UTheWorld::init(int lat1, int lat2, int size, int pop) {
 		}
 	}
 	delete lats; // deallocate no longer needed array
+	for (cID = 0; cID < pop; cID++) { // populate the world
+		People a = People(cID, size);
+		p.in(a);
+	}
 }
-Biomes UTheWorld::getBiome(int lat) {
+WorldInfo TheWorld::getWstats() {
+	return info;
+}
+PopInfo TheWorld::getPstats() {
+	PopInfo a;
+	a.extant = p.length();
+	a.extinct = cID - a.extant;
+	a.avg = p.avgT();
+	return a;
+}
+Biomes TheWorld::getBiome(int lat) {
 	return MAX_BIOM; // FIX THIS
 }

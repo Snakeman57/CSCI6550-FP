@@ -3,42 +3,42 @@
 
 #include "Population.h"
 
-UPopulation::UPopulation() : head(nullptr), ln(0) { // cxn
+Population::Population() : head(nullptr), ln(0) { // cxn
 }
 
-UPopulation::~UPopulation() { // dxn
+Population::~Population() { // dxn
 	if (head != nullptr) { // list not empty
-		for (FPopNode* i = head->nxt; head != nullptr; i = head->nxt) { // store & iterate path until empty
+		for (Node* i = head->nxt; head != nullptr; i = head->nxt) { // store & iterate path until empty
 			delete head; // delete node
 			head = i; // restore path
 		}
 	}
 }
-void UPopulation::in(UPeople& item) { // insert
+void Population::in(People& item) { // insert
 	if (head == nullptr) { // list is empty
-		head = new FPopNode; // insert new node at head
-		head->ppl.set(item); // insert ppl
+		head = new Node; // insert new node at head
+		head->ppl = item; // insert ppl
 		head->nxt = nullptr; // mark end of path
 	}
 	else {
-		FPopNode* a;
+		Node* a;
 		a = head;
-		head = new FPopNode; // insert node at sorted location, breaking path
-		head->ppl.set(item); // insert ppl
+		head = new Node; // insert node at sorted location, breaking path
+		head->ppl = item; // insert ppl
 		head->nxt = a->nxt; // prep forward location in path
 	}
 	ln++; // update length
 }
-void UPopulation::del(UPeople& item) { // delete
+void Population::del(People& item) { // delete
 	if (head != nullptr) { // unempty list
 		if (item == head->ppl) { // first
-			FPopNode* a = head; // prep node for deletion
+			Node* a = head; // prep node for deletion
 			head = head->nxt; // move head
 			delete a; // delete node
 			ln--; // update length
 		}
 		else { // general case
-			FPopNode* a, * b;
+			Node* a, * b;
 			bool f;
 			findItem(a, b, f, item);
 			if (f) { // node in list
@@ -50,11 +50,32 @@ void UPopulation::del(UPeople& item) { // delete
 	}
 
 }
-int UPopulation::length() const{ // public access to ln
+int Population::length() const{ // public access to ln
 	return ln;
 }
-void UPopulation::swap(FPopNode*& a, FPopNode*& b) { // swaps 2 nodes in the list
-	FPopNode* x, * y, * z;
+void Population::randomOrder() { // swaps nodes until all nodes have been swapped
+	Node* a = head;
+	for (int i = 0; i < ln; i++) { // iterate through list 
+		int x = rand() % ln - i; // how far b should iterate (a <= x < ln)
+		Node* b = a, * c = a->nxt; // set b to head & prep to iterate a
+		for (int j = 0; j <= x; j++) { // set b to random node - is there a more efficient way?
+			b = b->nxt;
+		}
+		swap(a, b); // swap operation
+		a = c; // iterate a
+	}
+}
+Traits Population::avgT() {
+	Traits a;
+	for (Node* i = head; i != nullptr; i = i->nxt) {
+		Traits b = i->ppl.getT();
+		a += b;
+	}
+	a /= ln;
+	return a;
+}
+void Population::swap(Node*& a, Node*& b) { // swaps 2 nodes in the list
+	Node* x, * y, * z;
 	bool f;
 	findItem(x, y, f, a->ppl); // get node before a
 	findItem(y, z, f, b->ppl); // get node before b
@@ -64,19 +85,7 @@ void UPopulation::swap(FPopNode*& a, FPopNode*& b) { // swaps 2 nodes in the lis
 	a->nxt = b->nxt; // swap path from a
 	b->nxt = z; // swap path from b
 }
-void UPopulation::randomOrder() { // swaps nodes until all nodes have been swapped
-	FPopNode* a = head;
-	for (int i = 0; i < ln; i++) { // iterate through list 
-		int x = rand() % ln - i; // how far b should iterate (a <= x < ln)
-		FPopNode* b = a, * c = a->nxt; // set b to head & prep to iterate a
-		for (int j = 0; j <= x; j++) { // set b to random node - is there a more efficient way?
-			b = b->nxt;
-		}
-		swap(a, b); // swap operation
-		a = c; // iterate a
-	}
-}
-void UPopulation::findItem(FPopNode*& ploc, FPopNode*& loc, bool& found, UPeople& item) { // internal placefinding
+void Population::findItem(Node*& ploc, Node*& loc, bool& found, People& item) { // internal placefinding
 	found = false;
 	loc = nullptr;
 	ploc = nullptr;

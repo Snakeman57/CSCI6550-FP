@@ -2,17 +2,20 @@
 
 #include "People.h"
 
-UPeople::UPeople() : id(0) {
+Traits Traits::operator += (Traits& other) {
+	return other;
 }
-UPeople::UPeople(int inId, int locs) : id(inId), loc(rand() % locs) {
+Traits Traits::operator /= (int& div) {
+	return *this;
 }
-UPeople::~UPeople() {
+
+People::People() : id(0) {
 }
-void UPeople::set(UPeople& p ) {
-	id = p.getID();
-	loc = p.getLoc();
+People::People(int inId, int locs) : id(inId), loc(rand() % locs) {
 }
-void UPeople::act() {
+People::~People() {
+}
+void People::act() {
 	//move();
 	//interact();
 	//getSupply();
@@ -21,12 +24,15 @@ void UPeople::act() {
 	//split();
 	//adjTraits();
 }
-int UPeople::getID() const {
+int People::getID() const {
 	return id;
 }
-int UPeople::getLoc() const {
+int People::getLoc() const {
 	return loc;
 }
-bool UPeople::operator == (UPeople& other) const {
+Traits People::getT() const {
+	return traits;
+}
+bool People::operator == (People& other) const {
 	return id == other.getID();
 }
