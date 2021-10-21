@@ -3,15 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/HUD.h"
-#include "DisplayMain.generated.h"
 
 /**
  * 
  */
-UCLASS()
-class ADisplayMain : public AHUD
+class CSCI6550_FP_API MyClass
 {
-	GENERATED_BODY()
-	
+public:
+	MyClass();
+	~MyClass();
 };
