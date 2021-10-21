@@ -13,7 +13,10 @@ TheWorld::~TheWorld() { // dxn
 		delete l; // deallocate the map - check if need to do neighbors seperately or if this is enough
 }
 void TheWorld::init(int lat1, int lat2, int size, int pop) {
-	l = new Location[size]; // synamically allocate the map from user specs
+	info.locations = size;
+	info.lat1 = lat1;
+	info.lat2 = lat2;
+	l = new Location[size]; // dynamically allocate the map from user specs
 	int * lats = new int[size]; // allocate temporary array
 	std::default_random_engine rngsus;
 	std::normal_distribution<double> bell((double)((lat1 + lat2) / 2), (double)((lat1 - lat2) / 6/*8*/));
@@ -23,6 +26,7 @@ void TheWorld::init(int lat1, int lat2, int size, int pop) {
 	//std::sort(*lats, *lats + size); // FIX THIS
 	for (int i = 0; i < size; i++) { // generate the map
 		l[i].biome = getBiome(lats[i]); // assign biome from latitude chances
+		info.biomes[l[i].biome]++;
 		l[i].supply = biomes[l[i].biome].supply; // assign base supply
 		int a = rand() % 6 + 1; // number of neighbors
 		l[i].nbrs = new Neighbor[(a <= size) ? a : size]; // contain if necessary

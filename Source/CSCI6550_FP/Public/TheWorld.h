@@ -57,7 +57,7 @@ public:
 private:
 	Biome biomes[Biomes::MAX_BIOM];
 	Weather weathers[Weathers::MAX_WTHR];
-	Location* l; // dynamically allocate an array
+	Location* l; // dynamically allocatable array
 	WorldInfo info;
 	Population p; // population of ppls
 	int cID; // current uniquie id value to apply to People creation
