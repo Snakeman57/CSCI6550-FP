@@ -31,7 +31,7 @@ private:
 	void trade(UPeople *&other);
 	void war(UPeople *&other);
 	void merge(UPeople*& other);
-	void getSuUPeopley();
+	void getSupply();
 	void eat();
 	void reproduce();
 	void split();
