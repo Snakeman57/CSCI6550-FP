@@ -12,13 +12,14 @@ struct Weather {
 	bool disaster[4]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
 };
 enum Biomes {
-	biome1,
+	biom1,
+	biom2,
 	MAX_BIOM
 };
 struct Biome {
 	Biomes name;
 	float supply; // base supply
-	UCurveFloat* freq; // frequency by latitute -100 to 100
+	FRealCurve freq; // frequency by latitute -100 to 100
 	float disaster[sizeof(Weather::disaster)]; // chances for natural disasters
 };
 struct Neighbor {

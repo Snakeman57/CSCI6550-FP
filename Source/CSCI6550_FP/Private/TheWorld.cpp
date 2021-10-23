@@ -13,8 +13,8 @@ TheWorld::~TheWorld() { // dxn
 	for (int i = 0; i < info.locations; i++) // deallocate neighbors in map
 		delete[] l[i].nbrs;
 	delete[] l; // deallocate the map
-	for (int i = 0; i < Biomes::MAX_BIOM; i++) // deallocate biome frequency curves
-		delete biomes[i].freq;
+	//for (int i = 0; i < Biomes::MAX_BIOM; i++) // deallocate biome frequency curves
+	//	delete biomes[i].freq;
 }
 void TheWorld::init(int lat1, int lat2, int size, int pop) {
 	info.locations = size;
@@ -26,7 +26,8 @@ void TheWorld::init(int lat1, int lat2, int size, int pop) {
 	std::default_random_engine rngsus;
 	std::normal_distribution<double> bell((double)((lat1 + lat2) / 2), (double)((lat1 - lat2) / 6/*8*/));
 	for (int i = 0; i < size; i++) { // fills latitude list with a normal distribution within range
-		lats[i] = /*std::clamp(*/(int)bell(rngsus)/*, lat1, lat2)*/; // FIX THIS
+		int a = (int)bell(rngsus);
+		lats[i] = (a > lat2) ? lat2 : ((a < lat1) ? lat1 : a) ; // clamp the latitude in range
 	}
 	//std::sort(*lats, *lats + size); // FIX THIS
 	for (int i = 0; i < size; i++) { // generate the map
@@ -68,8 +69,8 @@ void TheWorld::updtWeather() { // updates the weather for each location
 	for (int i = 0; i < info.locations; i++) {
 		l[i].weather.rain = bell(rngsus); // sets iedal weather modifier on a bell curve
 		l[i].weather.temp = bell(rngsus); // sets iedal temperature modifier on a bell curve
-		for (int j = 0;j < 5;j++) // sets natural disasters T/F depending on likelihood in biome
-			l[i].weather.disaster[j] = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) < biomes[l[i].biome].disaster[j]) ? true : false;
+		for (int j = 0; j < sizeof(Weather::disaster); j++) // sets natural disasters T/F depending on likelihood in biome
+			l[i].weather.disaster[j] = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) < biomes[l[i].biome].disaster[j]);
 	}
 }
 WorldInfo TheWorld::getWstats() const { // returns stats about the world
@@ -84,9 +85,9 @@ Biomes TheWorld::getBiome(int lat) { // returns a biome based on the probability
 	float biomeID = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); // random value between 0 and 1
 	Biomes biome = Biomes::MAX_BIOM;
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // takes the total frequency of all biomes at lat
-		max += biomes[i].freq->GetFloatValue((float)lat);
+		max += biomes[i].freq.Eval((float)lat);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // generates chances of any given biome occurring at lat
-		chance[i] = biomes[i].freq->GetFloatValue((float)lat) / max;
+		chance[i] = biomes[i].freq.Eval((float)lat) / max;
 	for (int i = 0; biomeID > 0 && i < Biomes::MAX_BIOM; i++) { // sets biome according to generated chances from earlier random number
 		biomeID -= chance[i];
 		biome = biomes[i].name;
@@ -102,27 +103,21 @@ void TheWorld::asgnBiomes() { // currently using hard coded values, look into im
 		{0, 0, 0, 0},
 		{0, 0, 0, 0}
 	};
-
-	FRichCurve* freqsData[Biomes::MAX_BIOM]; // frequency curves
+	FRealCurve freqsData[Biomes::MAX_BIOM]; // frequency curves
 	FKeyHandle key;
-	for (int i = 0; i < Biomes::MAX_BIOM; i++) {
-		freqsData[i] = new FRichCurve();
-	}
-	freqsData[0]->AddKey(-100.f, 0.f);
-	freqsData[0]->AddKey(100.f, 1.f);
-	//freqsData[0]->SetKeyInterpMode(key, ERichCurveInterpMode::RCIM_Linear);
-	freqsData[1]->AddKey(-100.f, 0.f);
-	//freqsData[1]->AddKey(100.f, 1.f);
-	//freqsData[1]->SetKeyInterpMode(key, ERichCurveInterpMode::RCIM_Linear);
-
+	freqsData[0] = FRealCurve();
+	freqsData[0].AddKey(-100.f, 0.f);
+	freqsData[0].AddKey(50.f, 1.f);
+	freqsData[0].AddKey(100.f, 0.f);
+	freqsData[1] = FRealCurve();
+	freqsData[1].AddKey(-100.f, 1.f);
+	freqsData[1].AddKey(50.f, 0.f);
+	freqsData[1].AddKey(100.f, 1.f);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) { // actually set the values
 		biomes[i].name = static_cast<Biomes>(i);
 		biomes[i].supply = supplies[i];
-		biomes[i].freq = NewObject<UCurveFloat>();
-		biomes[i].freq->FloatCurve = *freqsData[i];
+		biomes[i].freq = freqsData[i];
 		for(int j = 0; j < sizeof(Weather::disaster); j++)
 			biomes[i].disaster[i] = disasters[i][j];
 	}
-	for (auto& i : freqsData) 
-		delete i;
 }
