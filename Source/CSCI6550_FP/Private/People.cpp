@@ -5,7 +5,7 @@
 Traits Traits::operator += (Traits& other) {
 	return other;
 }
-Traits Traits::operator /= (int& div) {
+Traits Traits::operator /= (const int& div) {
 	return *this;
 }
 
@@ -13,9 +13,12 @@ People::People() : id(0) {
 }
 People::People(int inId, int locs) : id(inId), loc(rand() % locs) {
 }
+People::People(int inId, People& ppl) : id(inId), loc(ppl.getLoc()) {
+	traits = ppl.getT();
+}
 People::~People() {
 }
-void People::act() {
+void People::tick() { // does one tick of the sim
 	//move();
 	//interact();
 	//getSupply();
@@ -32,6 +35,9 @@ int People::getLoc() const {
 }
 Traits People::getT() const {
 	return traits;
+}
+float People::getS() const {
+	return supply;
 }
 bool People::operator == (People& other) const {
 	return id == other.getID();

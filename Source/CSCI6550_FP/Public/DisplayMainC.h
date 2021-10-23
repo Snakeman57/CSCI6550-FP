@@ -20,11 +20,13 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		TArray<int> biomes; // number of each biomme
 	UPROPERTY(BlueprintReadOnly)
-		float avgSupply; // average supply value
+		float avgSupplyW; // average supply value
 	UPROPERTY(BlueprintReadOnly)
 		int extant; // number of living Peoples
 	UPROPERTY(BlueprintReadOnly)
 		int extinct; // number of dead Peoples
+	UPROPERTY(BlueprintReadOnly)
+		float avgSupplyP; // average supply value
 	FSimStats operator =(WorldInfo& other);
 	FSimStats operator =(PopInfo& other);
 };
@@ -38,6 +40,8 @@ public:
 		void newSim(int lat1, int lat2, int size, int pop);
 	UFUNCTION(BlueprintCallable)
 		FSimStats getStats();
+protected:
+
 private:
 	TheWorld* world;
 };

@@ -11,13 +11,14 @@ FSimStats FSimStats::operator =(WorldInfo& other) {
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) {
 		biomes.Add(other.biomes[i]);
 	}
-	avgSupply = other.avgSupply;
+	avgSupplyW = other.avgSupply;
 	return *this;
 }
 FSimStats FSimStats::operator =(PopInfo& other) {
 	//avg = other.avg;
 	extant = other.extant;
 	extinct = other.extinct;
+	avgSupplyP = other.avgSupply;
 	return *this;
 }
 UDisplayMainC::~UDisplayMainC() {

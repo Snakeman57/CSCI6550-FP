@@ -7,17 +7,19 @@
 struct Traits {
 	float a; // 
 	Traits operator += (Traits& other);
-	Traits operator /= (int& div);
+	Traits operator /= (const int& div);
 };
 class CSCI6550_FP_API People {
 public:
 	People();
 	People(int inId, int locs);
+	People(int inId, People& ppl);
 	~People();
-	void act();
+	void tick();
 	int getID() const;
 	int getLoc() const;
 	Traits getT() const;
+	float getS() const;
 	bool operator == (People& other) const;
 private:
 	int id; // unique id for searches
