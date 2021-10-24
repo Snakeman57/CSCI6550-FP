@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
 #include "TheWorld.h"
+#include <Runtime\Core\Public\Misc\Paths.h>
 #include "DisplayMainC.generated.h"
 
 USTRUCT(BlueprintType)
@@ -35,6 +36,7 @@ class CSCI6550_FP_API UDisplayMainC : public UUserWidget
 {
 	GENERATED_BODY()
 public:
+	UDisplayMainC(const FObjectInitializer& ObjectInitializer);
 	~UDisplayMainC();
 	UFUNCTION(BlueprintCallable)
 		void newSim(int lat1, int lat2, int size, int pop);

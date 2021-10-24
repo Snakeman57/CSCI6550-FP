@@ -21,6 +21,10 @@ FSimStats FSimStats::operator =(PopInfo& other) {
 	avgSupplyP = other.avgSupply;
 	return *this;
 }
+UDisplayMainC::UDisplayMainC(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+	FString tmp = FPaths::GameSourceDir() + " #";
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, tmp);
+}
 UDisplayMainC::~UDisplayMainC() {
 	if (world != nullptr) delete world;
 }

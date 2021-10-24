@@ -9,7 +9,7 @@ void UNumberBoxC::HandleOnTextChanged(FText const& t) {
 	Super::HandleOnTextChanged(t);
 	FText tmp = t;
 	int32 val = UKismetStringLibrary::Conv_StringToInt(UKismetTextLibrary::Conv_TextToString(t));
-	if ((UKismetStringLibrary::IsNumeric(UKismetTextLibrary::Conv_TextToString(tmp)) || tmp.EqualTo(FText::GetEmpty()))/* && val > min && val < max*/) {
+	if ((UKismetStringLibrary::IsNumeric(UKismetTextLibrary::Conv_TextToString(tmp)) || tmp.EqualTo(FText::GetEmpty()))/* && val => min && val <= max*/) {
 			last = t;
 	}
 	SetText(last);

@@ -5,6 +5,11 @@
 #include "CoreMinimal.h"
 #include "Population.h"
 #include "Curves/CurveFloat.h"
+#include <Runtime\Core\Public\Misc\Paths.h>
+#include <random>
+#include <algorithm>
+#include <fstream>
+#include <string>
 
 struct Weather {
 	float rain = 0; // ideal rainfall modifier
@@ -12,8 +17,16 @@ struct Weather {
 	bool disaster[4]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
 };
 enum Biomes {
-	biom1,
-	biom2,
+	Tropical_Rainforest,
+	Savannah,
+	Desert,
+	Chaparral,
+	Temperate_Steppe,
+	Temperate_Broadleaf_Forest,
+	Coniferous_Forest,
+	Tundra,
+	Alpine_Tundra,
+	Polar_Ice,
 	MAX_BIOM
 };
 struct Biome {
