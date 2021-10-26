@@ -39,7 +39,7 @@ public:
 	UDisplayMainC(const FObjectInitializer& ObjectInitializer);
 	~UDisplayMainC();
 	UFUNCTION(BlueprintCallable)
-		void newSim(int lat1, int lat2, int size, int pop);
+		void newSim(const int& lat1, const int& lat2, const int& size, const int& pop);
 	UFUNCTION(BlueprintCallable)
 		FSimStats getStats();
 protected:

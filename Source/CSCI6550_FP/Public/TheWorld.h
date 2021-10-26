@@ -14,7 +14,7 @@
 struct Weather {
 	float rain = 0; // ideal rainfall modifier
 	float temp = 0; // ideal tmp modifier
-	bool disaster[4]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
+	bool disaster[5]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
 };
 enum Biomes {
 	Tropical_Rainforest,
@@ -32,7 +32,7 @@ enum Biomes {
 struct Biome {
 	Biomes name;
 	float supply; // base supply
-	FRealCurve freq; // frequency by latitute -100 to 100
+	FRichCurve freq; // frequency by latitute -100 to 100
 	float disaster[sizeof(Weather::disaster)]; // chances for natural disasters
 };
 struct Neighbor {
@@ -40,7 +40,7 @@ struct Neighbor {
 	int dist; // difficulty to get to location
 };
 struct Location {
-	Neighbor* nbrs; // neighbors
+	TArray<Neighbor> nbrs; // neighbors
 	Biomes biome; // biome
 	Weather weather; // weather
 	float supply; // supply
@@ -54,9 +54,8 @@ struct WorldInfo {
 class CSCI6550_FP_API TheWorld {
 public:
 	TheWorld();
-	TheWorld(int lat1, int lat2, int size, int pop);
 	~TheWorld();
-	void init(int lat1, int lat2, int size, int pop);
+	void init(const int& lat1, const int& lat2, const int& size, const int& pop);
 	void tick(); // does one tick of the sim
 	void updtSupply(); // moves supply in each location towards base
 	void updtWeather(); // changes the weather in each location
@@ -65,9 +64,9 @@ public:
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
 	const int bsRt; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)
-	Location* l; // dynamically allocatable array
+	TArray<Location> l; // dynamically allocatable array
 	WorldInfo info; // info from l
 	Population p; // population of ppls
 	void asgnBiomes();
-	Biomes getBiome(int lat); // returns a biome based on the probability of occurring at a given latitue
+	Biomes getBiome(int& lat) const; // returns a biome based on the probability of occurring at a given latitue
 };

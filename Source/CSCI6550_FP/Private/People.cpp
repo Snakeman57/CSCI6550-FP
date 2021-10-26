@@ -9,11 +9,10 @@ Traits Traits::operator /= (const int& div) {
 	return *this;
 }
 
-People::People() : id(0) {
+People::People(int inId, int locs) : id(inId), loc(rand() % locs), supply(0.f) {
+	//traits.traitname = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 }
-People::People(int inId, int locs) : id(inId), loc(rand() % locs) {
-}
-People::People(int inId, People& ppl) : id(inId), loc(ppl.getLoc()) {
+People::People(int inId, People& ppl) : id(inId), loc(ppl.getLoc()), supply(ppl.getS()) {
 	traits = ppl.getT();
 }
 People::~People() {

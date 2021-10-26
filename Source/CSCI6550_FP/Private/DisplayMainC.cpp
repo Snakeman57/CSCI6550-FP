@@ -23,13 +23,14 @@ FSimStats FSimStats::operator =(PopInfo& other) {
 }
 UDisplayMainC::UDisplayMainC(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
 	FString tmp = FPaths::GameSourceDir() + " #";
-	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, tmp);
 }
 UDisplayMainC::~UDisplayMainC() {
-	if (world != nullptr) delete world;
+	delete world;
 }
-void UDisplayMainC::newSim(int lat1, int lat2, int size, int pop) {
-	world = new TheWorld(lat1, lat2, size, pop);
+void UDisplayMainC::newSim(const int& lat1, const int& lat2, const int& size, const int& pop) {
+	delete world;
+	world = new TheWorld;
+	world->init(lat1, lat2, size, pop);
 }
 FSimStats UDisplayMainC::getStats() {
 	FSimStats a;

@@ -34,8 +34,9 @@ void Population::tick() { // does one tick of the sim
 		keys.Remove(keys[key]);
 	}
 	for (int i = 0; i < length(); i++) {
-		ppls[i].tick();
+		ppls[order[i]].tick();
 	}
+	delete order;
 }
 PopInfo Population::stats() const {
 	PopInfo tmp;

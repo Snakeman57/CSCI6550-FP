@@ -11,7 +11,6 @@ struct Traits {
 };
 class CSCI6550_FP_API People {
 public:
-	People();
 	People(int inId, int locs);
 	People(int inId, People& ppl);
 	~People();
