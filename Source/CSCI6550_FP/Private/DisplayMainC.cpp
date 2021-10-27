@@ -15,7 +15,9 @@ FSimStats FSimStats::operator =(WorldInfo& other) {
 	return *this;
 }
 FSimStats FSimStats::operator =(PopInfo& other) {
-	//avg = other.avg;
+	for (int i = 0; i < Traits::MAX_TRAIT; i++) {
+		traits.Add(other.avg[i]);
+	}
 	extant = other.extant;
 	extinct = other.extinct;
 	avgSupplyP = other.avgSupply;

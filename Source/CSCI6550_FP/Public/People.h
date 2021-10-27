@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 
-struct Traits {
-	float a; // 
-	Traits operator += (Traits& other);
-	Traits operator /= (const int& div);
+UENUM()
+enum Traits {
+	trait1,
+	trait2,
+	MAX_TRAIT UMETA(Hidden)
 };
 class CSCI6550_FP_API People {
 public:
@@ -17,19 +18,20 @@ public:
 	void tick();
 	int getID() const;
 	int getLoc() const;
-	Traits getT() const;
+	float getT(Traits t) const;
+	float getT(int t) const;
 	float getS() const;
 	bool operator == (People& other) const;
 private:
 	int id; // unique id for searches
 	int pop; // integer representing population
-	Traits traits; // the traits for this People (see struct above)
+	float traits[Traits::MAX_TRAIT]; // the traits for this People
 	float supply; 
 	int loc; // location index
 	void move();
 	void interact();
 	void trade(People *&other);
-	void war(People *&other);
+	void war(People *&other); // what does the victor do: release, enslave, slaughter
 	void merge(People*& other);
 	void getSupply();
 	void eat();

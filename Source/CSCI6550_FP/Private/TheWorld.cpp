@@ -82,9 +82,9 @@ Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the prob
 	float biomeID = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); // random value between 0 and 1
 	Biomes biome = Biomes::MAX_BIOM;
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // takes the total frequency of all biomes at lat
-		max += biomes[i].freq.Eval((float)lat);
+		max += biomes[i].freq.Eval((float)poslat);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // generates chances of any given biome occurring at lat
-		chance[i] = biomes[i].freq.Eval((float)lat) / max;
+		chance[i] = biomes[i].freq.Eval((float)poslat) / max;
 	for (int i = 0; biomeID > 0 && i < Biomes::MAX_BIOM; i++) { // sets biome according to generated chances from earlier random number
 		biomeID -= chance[i];
 		biome = biomes[i].name;

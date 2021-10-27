@@ -9,7 +9,7 @@
 struct PopInfo {
 	int extant;
 	int extinct;
-	Traits avg;
+	float avg[Traits::MAX_TRAIT];
 	float avgSupply;
 };
 class CSCI6550_FP_API Population {

@@ -19,7 +19,6 @@ void Population::clone(People& ppl) { // generate & insert
 }
 void Population::del(int id) { // delete
 	ppls.Remove(id);
-
 }
 int Population::length() const { // public access to ppls.Num()
 	return ppls.Num();
@@ -42,14 +41,22 @@ PopInfo Population::stats() const {
 	PopInfo tmp;
 	tmp.extant = length();
 	tmp.extinct = cID - length();
-	Traits a;
+	float a[Traits::MAX_TRAIT];
+	for (auto& i : a)
+		i = 0;
 	float s = 0;
 	for (auto& i : ppls) {
-		Traits b = i.Value.getT();
-		a += b;
+		for (int j = 0; j < Traits::MAX_TRAIT; j++) {
+			float b = i.Value.getT(j);
+			a[j] += b;
+		}
 		s += i.Value.getS();
 	}
-	a /= length();
-	tmp.avg = a;
+	for (auto& i : a)
+		i /= length();
+	for (int i = 0; i < Traits::MAX_TRAIT; i++)
+		tmp.avg[i] = a[i];
+	s /= length();
+	tmp.avgSupply = s;
 	return tmp;
 }

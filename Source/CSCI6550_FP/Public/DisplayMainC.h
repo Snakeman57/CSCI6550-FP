@@ -23,6 +23,8 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float avgSupplyW; // average supply value
 	UPROPERTY(BlueprintReadOnly)
+		TArray<float> traits; // average trait value
+	UPROPERTY(BlueprintReadOnly)
 		int extant; // number of living Peoples
 	UPROPERTY(BlueprintReadOnly)
 		int extinct; // number of dead Peoples

@@ -16,18 +16,19 @@ struct Weather {
 	float temp = 0; // ideal tmp modifier
 	bool disaster[5]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
 };
+UENUM()
 enum Biomes {
-	Tropical_Rainforest,
-	Savannah,
-	Desert,
-	Chaparral,
-	Temperate_Steppe,
-	Temperate_Broadleaf_Forest,
-	Coniferous_Forest,
-	Tundra,
-	Alpine_Tundra,
-	Polar_Ice,
-	MAX_BIOM
+	Tropical_Rainforest UMETA(DisplayName = "Tropical Rainforest"),
+	Savannah UMETA(DisplayName = "Savannah"),
+	Desert UMETA(DisplayName = "Desert"),
+	Chaparral UMETA(DisplayName = "Chaparral"),
+	Temperate_Steppe UMETA(DisplayName = "Temperate Steppe"),
+	Temperate_Broadleaf_Forest UMETA(DisplayName = "Temperate Broadleaf Forest"),
+	Coniferous_Forest UMETA(DisplayName = "Coniferous Forest"),
+	Tundra UMETA(DisplayName = "Tundra"),
+	Alpine_Tundra UMETA(DisplayName = "Alpine Tundra"),
+	Polar_Ice UMETA(DisplayName = "Polar Ice"),
+	MAX_BIOM UMETA(Hidden)
 };
 struct Biome {
 	Biomes name;

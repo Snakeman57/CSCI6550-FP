@@ -2,29 +2,24 @@
 
 #include "People.h"
 
-Traits Traits::operator += (Traits& other) {
-	return other;
-}
-Traits Traits::operator /= (const int& div) {
-	return *this;
-}
-
 People::People(int inId, int locs) : id(inId), loc(rand() % locs), supply(0.f) {
-	//traits.traitname = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	for(auto& i : traits)
+		i = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 }
 People::People(int inId, People& ppl) : id(inId), loc(ppl.getLoc()), supply(ppl.getS()) {
-	traits = ppl.getT();
+	for (int i = 0; i < Traits::MAX_TRAIT; i++)
+		traits[i] = ppl.getT(i);
 }
 People::~People() {
 }
 void People::tick() { // does one tick of the sim
-	//move();
-	//interact();
-	//getSupply();
-	//eat();
-	//reproduce();
-	//split();
-	//adjTraits();
+	//move(); // where to move // desire to move to or aviod other people, desire to stay with or leave other poeole, 
+	//interact(); // what interaction to make
+	//getSupply(); // what to focus on: hunt (big or small game), gather, fish
+	//eat(); // pop + trait mods
+	//reproduce(); // avg birth/death ratio
+	//split(); // 150 - 200
+	//adjTraits(); // small random adjustments
 }
 int People::getID() const {
 	return id;
@@ -32,8 +27,11 @@ int People::getID() const {
 int People::getLoc() const {
 	return loc;
 }
-Traits People::getT() const {
-	return traits;
+float People::getT(Traits t) const {
+	return traits[t];
+}
+float People::getT(int t) const {
+	return traits[t];
 }
 float People::getS() const {
 	return supply;
