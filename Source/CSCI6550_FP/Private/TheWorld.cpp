@@ -50,7 +50,7 @@ void TheWorld::tick() { // does one tick of the sim
 }
 void TheWorld::updtSupply() { // updates the supply value for each location
 	for (int i = 0; i < info.locations; i++) {
-		for (int j = 0; j < sizeof(Weather::disaster); j++)
+		for (int j = 0; j < Disasters::MAX_DSTR; j++)
 			if (l[i].weather.disaster[j])
 				l[i].supply *= 0.8;
 		if (l[i].supply != biomes[l[i].biome].supply) // moves supply toward biome base
@@ -65,7 +65,7 @@ void TheWorld::updtWeather() { // updates the weather for each location
 	for (int i = 0; i < info.locations; i++) {
 		l[i].weather.rain = bell(rngsus); // sets iedal weather modifier on a bell curve
 		l[i].weather.temp = bell(rngsus); // sets iedal temperature modifier on a bell curve
-		for (int j = 0; j < sizeof(Weather::disaster); j++) // sets natural disasters T/F depending on likelihood in biome
+		for (int j = 0; j < Disasters::MAX_DSTR; j++) // sets natural disasters T/F depending on likelihood in biome
 			l[i].weather.disaster[j] = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) < biomes[l[i].biome].disaster[j]);
 	}
 }
@@ -99,7 +99,7 @@ void TheWorld::asgnBiomes() { // look into importing and store biome data
 		biomes[i].name = static_cast<Biomes>(i); // set name to enum value
 		std::getline(biomeData, input, ',');
 		biomes[i].supply = stof(input); // set supply from first value on line
-		for (int j = 0; j < sizeof(Weather::disaster); j++) { // set disaster chances from next four values on line
+		for (int j = 0; j < Disasters::MAX_DSTR; j++) { // set disaster chances from next four values on line
 			std::getline(biomeData, input, ',');
 			biomes[i].disaster[i] = stof(input);
 		}

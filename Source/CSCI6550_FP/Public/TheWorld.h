@@ -11,30 +11,40 @@
 #include <fstream>
 #include <string>
 
+UENUM()
+enum Disasters {
+	quake UMETA(DisplayName = "Earthquake"),
+	volcano UMETA(DisplayName = "Volcanic Eruption"),
+	tornado UMETA(DisplayName = "Tornado"),
+	hurricane UMETA(DisplayName = "Hurricane"),
+	tsunami UMETA(DisplayName = "Tsunami"),
+	MAX_DSTR UMETA(Hidden)
+};
 struct Weather {
 	float rain = 0; // ideal rainfall modifier
 	float temp = 0; // ideal tmp modifier
-	bool disaster[5]; // 0=earthquake, 1=volcano, 2=tornado, 3=hurricane, 4=tsunami
+	bool disaster[Disasters::MAX_DSTR]; // did a disaster occur
 };
 UENUM()
 enum Biomes {
-	Tropical_Rainforest UMETA(DisplayName = "Tropical Rainforest"),
-	Savannah UMETA(DisplayName = "Savannah"),
-	Desert UMETA(DisplayName = "Desert"),
-	Chaparral UMETA(DisplayName = "Chaparral"),
-	Temperate_Steppe UMETA(DisplayName = "Temperate Steppe"),
-	Temperate_Broadleaf_Forest UMETA(DisplayName = "Temperate Broadleaf Forest"),
-	Coniferous_Forest UMETA(DisplayName = "Coniferous Forest"),
-	Tundra UMETA(DisplayName = "Tundra"),
-	Alpine_Tundra UMETA(DisplayName = "Alpine Tundra"),
-	Polar_Ice UMETA(DisplayName = "Polar Ice"),
+	tforest UMETA(DisplayName = "Tropical Rainforest"),
+	savannah UMETA(DisplayName = "Savannah"),
+	desert UMETA(DisplayName = "Desert"),
+	chapparral UMETA(DisplayName = "Chaparral"),
+	steppe UMETA(DisplayName = "Temperate Steppe"),
+	dforest UMETA(DisplayName = "Temperate Broadleaf Forest"),
+	cforest UMETA(DisplayName = "Coniferous Forest"),
+	tundra UMETA(DisplayName = "Tundra"),
+	mountain UMETA(DisplayName = "Alpine Tundra"),
+	polar UMETA(DisplayName = "Polar Ice"),
 	MAX_BIOM UMETA(Hidden)
 };
 struct Biome {
 	Biomes name;
 	float supply; // base supply
 	FRichCurve freq; // frequency by latitute -100 to 100
-	float disaster[sizeof(Weather::disaster)]; // chances for natural disasters
+	bool coastal; // whether or not this biome has access to large bodies of water
+	float disaster[Disasters::MAX_DSTR]; // chances for natural disasters
 };
 struct Neighbor {
 	int loc; // index of location being referenced
