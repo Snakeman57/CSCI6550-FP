@@ -11,7 +11,7 @@
 #include <fstream>
 #include <string>
 
-UENUM()
+UENUM(BlueprintType)
 enum Disasters {
 	quake UMETA(DisplayName = "Earthquake"),
 	volcano UMETA(DisplayName = "Volcanic Eruption"),
@@ -25,7 +25,7 @@ struct Weather {
 	float temp = 0; // ideal tmp modifier
 	bool disaster[Disasters::MAX_DSTR]; // did a disaster occur
 };
-UENUM()
+UENUM(BlueprintType)
 enum Biomes {
 	tforest UMETA(DisplayName = "Tropical Rainforest"),
 	savannah UMETA(DisplayName = "Savannah"),

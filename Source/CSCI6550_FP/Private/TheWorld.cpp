@@ -113,5 +113,6 @@ void TheWorld::asgnBiomes() { // look into importing and store biome data
 			float freq = std::stof(input);
 			biomes[i].freq.AddKey(lat, freq);
 		}
+		info.biomes[i] = 0;
 	}
 }
