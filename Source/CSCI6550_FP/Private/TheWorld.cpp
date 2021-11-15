@@ -85,20 +85,28 @@ Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the prob
 		max += biomes[i].freq.Eval((float)poslat);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // generates chances of any given biome occurring at lat
 		chance[i] = biomes[i].freq.Eval((float)poslat) / max;
+	LStream Stream;
+	std::cout.rdbuf(&Stream);
 	for (int i = 0; biomeID > 0 && i < Biomes::MAX_BIOM; i++) { // sets biome according to generated chances from earlier random number
 		biomeID -= chance[i];
 		biome = biomes[i].name;
+		std::cout << "lat: " << lat  << " biome: " << biomes[i].name << " chance: " << chance[i] << std::endl;
 	}
+	std::cout << "chose above" << std::endl;
 	return biome; // return chosen biome
 }
 void TheWorld::asgnBiomes() { // look into importing and store biome data
 	FString dir = FPaths::GameSourceDir();
 	std::ifstream biomeData(std::string(TCHAR_TO_UTF8(*dir)) + "CSCI6550_FP/CSCI6550-FP-BIOMES-CSV.csv"); // import data
 	std::string input; // for readinig data
+	LStream Stream;
+	std::cout.rdbuf(&Stream);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) { // iterate through biomes
 		biomes[i].name = static_cast<Biomes>(i); // set name to enum value
+		std::cout << i << ": ";
 		std::getline(biomeData, input, ',');
 		biomes[i].supply = stof(input); // set supply from first value on line
+		std::cout << biomes[i].supply;
 		for (int j = 0; j < Disasters::MAX_DSTR; j++) { // set disaster chances from next four values on line
 			std::getline(biomeData, input, ',');
 			biomes[i].disaster[i] = stof(input);
@@ -113,6 +121,7 @@ void TheWorld::asgnBiomes() { // look into importing and store biome data
 			float freq = std::stof(input);
 			biomes[i].freq.AddKey(lat, freq);
 		}
+		std::cout << std::endl;
 		info.biomes[i] = 0;
 	}
 }

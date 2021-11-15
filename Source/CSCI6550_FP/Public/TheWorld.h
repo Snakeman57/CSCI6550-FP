@@ -10,7 +10,17 @@
 #include <algorithm>
 #include <fstream>
 #include <string>
+#include <iostream>
+#include <sstream>
 
+class LStream : public std::stringbuf {
+protected:
+	int sync() {
+		UE_LOG(LogTemp, Log, TEXT("%s"), *FString(str().c_str()));
+		str("");
+		return std::stringbuf::sync();
+	}
+};
 UENUM(BlueprintType)
 enum Disasters {
 	quake UMETA(DisplayName = "Earthquake"),
@@ -31,12 +41,12 @@ enum Biomes {
 	savannah UMETA(DisplayName = "Savannah"),
 	desert UMETA(DisplayName = "Desert"),
 	chapparral UMETA(DisplayName = "Chaparral"),
-	steppe UMETA(DisplayName = "Temperate Steppe"),
 	dforest UMETA(DisplayName = "Temperate Broadleaf Forest"),
 	cforest UMETA(DisplayName = "Coniferous Forest"),
 	tundra UMETA(DisplayName = "Tundra"),
 	mountain UMETA(DisplayName = "Alpine Tundra"),
 	polar UMETA(DisplayName = "Polar Ice"),
+	steppe UMETA(DisplayName = "Temperate Grassland"),
 	MAX_BIOM UMETA(Hidden)
 };
 struct Biome {
@@ -55,6 +65,7 @@ struct Location {
 	Biomes biome; // biome
 	Weather weather; // weather
 	float supply; // supply
+	//TArray<People> p;
 };
 struct WorldInfo {
 	int locations; // number of locations
