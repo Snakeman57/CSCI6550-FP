@@ -13,7 +13,7 @@
 #include <iostream>
 #include <sstream>
 
-class LStream : public std::stringbuf {
+class LStream : public std::stringbuf { // for writing to console
 protected:
 	int sync() {
 		UE_LOG(LogTemp, Log, TEXT("%s"), *FString(str().c_str()));
@@ -21,6 +21,9 @@ protected:
 		return std::stringbuf::sync();
 	}
 };
+//LStream Stream;
+//std::cout.rdbuf(&Stream);
+
 UENUM(BlueprintType)
 enum Disasters {
 	quake UMETA(DisplayName = "Earthquake"),
@@ -83,6 +86,8 @@ public:
 	void updtWeather(); // changes the weather in each location
 	WorldInfo getWstats() const;
 	PopInfo getPstats() const;
+	Location getLoc(int &loc);
+	void getNeighbors(int &loc, TArray<Neighbor>& n);
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
 	const int bsRt; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)

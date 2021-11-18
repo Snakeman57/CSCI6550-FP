@@ -2,12 +2,9 @@
 
 #include "TheWorld.h"
 
-TheWorld::TheWorld() : bsRt(50) { // default numbers, MUST CALL INIT BEFORE USING CLASS
+TheWorld::TheWorld() : bsRt(50){ // default numbers, MUST CALL INIT BEFORE USING CLASS
 }
 TheWorld::~TheWorld() { // dxn
-	//for (int i = 0; i < info.locations; i++) // deallocate neighbors in map
-	//	delete[] l[i].nbrs;
-	//delete[] l; // deallocate the map
 }
 void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int& pop) { // practical cxn, must be called seperately
 	info.locations = size;
@@ -38,6 +35,7 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 		}
 		l.Add(loc);
 	}
+	updtSupply();
 	delete lats; // deallocate no longer needed array
 	for (int i = 0; i < pop; i++) { // populate the world
 		p.addNew(size);
@@ -46,7 +44,7 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 void TheWorld::tick() { // does one tick of the sim
 	updtSupply();
 	updtWeather();
-	p.tick();
+	p.tick(*this);
 }
 void TheWorld::updtSupply() { // updates the supply value for each location
 	for (int i = 0; i < info.locations; i++) {
@@ -58,6 +56,10 @@ void TheWorld::updtSupply() { // updates the supply value for each location
 		else // randomly adjusts supply for the year from biome base
 			l[i].supply += ((biomes[l[i].biome].supply / bsRt / 2) * ((((rand() % 2) > 0) ? 1.f : -1.f) + l[i].weather.rain + l[i].weather.temp));
 	}
+	info.avgSupply = 0;
+	for (int i = 0; i < l.Num(); i++)
+		info.avgSupply += l[i].supply;
+	info.avgSupply /= l.Num();
 }
 void TheWorld::updtWeather() { // updates the weather for each location
 	std::default_random_engine rngsus;
@@ -75,6 +77,13 @@ WorldInfo TheWorld::getWstats() const { // returns stats about the world
 PopInfo TheWorld::getPstats() const { // returns stats about the population
 	return p.stats();
 }
+Location TheWorld::getLoc(int& loc) {
+	return l[loc];
+}
+void TheWorld::getNeighbors(int& loc, TArray<Neighbor>& n) {
+	for (int i = 0; l[loc].nbrs.Num(); i++)
+		n.Add(l[loc].nbrs[i]);
+}
 Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the probability of occurring at a given latitue
 	int poslat = abs(lat);
 	float max = 0;
@@ -85,28 +94,21 @@ Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the prob
 		max += biomes[i].freq.Eval((float)poslat);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // generates chances of any given biome occurring at lat
 		chance[i] = biomes[i].freq.Eval((float)poslat) / max;
-	LStream Stream;
-	std::cout.rdbuf(&Stream);
 	for (int i = 0; biomeID > 0 && i < Biomes::MAX_BIOM; i++) { // sets biome according to generated chances from earlier random number
 		biomeID -= chance[i];
 		biome = biomes[i].name;
-		std::cout << "lat: " << lat  << " biome: " << biomes[i].name << " chance: " << chance[i] << std::endl;
 	}
-	std::cout << "chose above" << std::endl;
 	return biome; // return chosen biome
 }
 void TheWorld::asgnBiomes() { // look into importing and store biome data
+	const float supplyBs = 2000;
 	FString dir = FPaths::GameSourceDir();
 	std::ifstream biomeData(std::string(TCHAR_TO_UTF8(*dir)) + "CSCI6550_FP/CSCI6550-FP-BIOMES-CSV.csv"); // import data
 	std::string input; // for readinig data
-	LStream Stream;
-	std::cout.rdbuf(&Stream);
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) { // iterate through biomes
 		biomes[i].name = static_cast<Biomes>(i); // set name to enum value
-		std::cout << i << ": ";
 		std::getline(biomeData, input, ',');
-		biomes[i].supply = stof(input); // set supply from first value on line
-		std::cout << biomes[i].supply;
+		biomes[i].supply = stof(input) * supplyBs; // set supply from first value on line
 		for (int j = 0; j < Disasters::MAX_DSTR; j++) { // set disaster chances from next four values on line
 			std::getline(biomeData, input, ',');
 			biomes[i].disaster[i] = stof(input);
@@ -121,7 +123,47 @@ void TheWorld::asgnBiomes() { // look into importing and store biome data
 			float freq = std::stof(input);
 			biomes[i].freq.AddKey(lat, freq);
 		}
-		std::cout << std::endl;
 		info.biomes[i] = 0;
 	}
+}
+// FROM POPULATION.H REQUIRING THEWORLD
+void Population::tick(TheWorld& w) { // does one tick of the sim
+	int* order = new int[length()];
+	TArray<int> keys;
+	ppls.GetKeys(keys);
+	for (int i = 0; i < length(); i++) {
+		int key = rand() % keys.Num();
+		order[i] = keys[key];
+		keys.Remove(keys[key]);
+	}
+	for (int i = 0; i < length(); i++) {
+		ppls[order[i]].tick(w);
+	}
+	delete order;
+}
+//FROM PEOPLE.H REQUIRING THEWORLD
+void People::move(TheWorld& w) {
+	TArray<Neighbor> n;
+	w.getNeighbors(loc, n);
+	int dstn = loc, dist = 0;
+	float h = w.getLoc(loc).supply;
+	for (int i = 0; i < n.Num(); i++) {
+		if (w.getLoc(n[i].loc).supply - n[i].dist > h) {
+			h = w.getLoc(n[i].loc).supply - n[i].dist;
+			dstn = n[i].loc;
+			dist = n[i].dist;
+		}
+	}
+	if (dstn != loc)
+		supply -= dist * pop;
+	loc = dstn;
+}
+void People::interact(TheWorld& w) {
+
+}
+void People::getSupply(TheWorld& w) {
+
+}
+void People::split(TheWorld& w) {
+	
 }

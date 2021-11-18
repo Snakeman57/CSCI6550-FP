@@ -20,7 +20,7 @@ public:
 	void addNew(int size); // generate & insert
 	void clone(People& ppl); // copy & insert
 	int length() const; // public access to length
-	void tick();
+	void tick(TheWorld& w); // defined in TheWorld.cpp
 	PopInfo stats() const; // average trait vaules across population
 private:
 	TMap<int, People> ppls;

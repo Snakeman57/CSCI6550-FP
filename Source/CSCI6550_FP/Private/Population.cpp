@@ -23,20 +23,6 @@ void Population::del(int id) { // delete
 int Population::length() const { // public access to ppls.Num()
 	return ppls.Num();
 }
-void Population::tick() { // does one tick of the sim
-	int* order = new int[length()];
-	TArray<int> keys;
-	ppls.GetKeys(keys);
-	for (int i = 0; i < length(); i++) {
-		int key = rand() % keys.Num();
-		order[i] = keys[key];
-		keys.Remove(keys[key]);
-	}
-	for (int i = 0; i < length(); i++) {
-		ppls[order[i]].tick();
-	}
-	delete order;
-}
 PopInfo Population::stats() const {
 	PopInfo tmp;
 	tmp.extant = length();
