@@ -44,6 +44,8 @@ public:
 		void newSim(const int& lat1, const int& lat2, const int& size, const int& pop);
 	UFUNCTION(BlueprintCallable)
 		FSimStats getStats();
+	UFUNCTION(BlueprintCallable)
+		void runSim();
 protected:
 
 private:

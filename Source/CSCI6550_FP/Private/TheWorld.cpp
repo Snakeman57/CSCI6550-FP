@@ -81,7 +81,7 @@ Location TheWorld::getLoc(int& loc) {
 	return l[loc];
 }
 void TheWorld::getNeighbors(int& loc, TArray<Neighbor>& n) {
-	for (int i = 0; l[loc].nbrs.Num(); i++)
+	for (int i = 0; i < l[loc].nbrs.Num(); i++)
 		n.Add(l[loc].nbrs[i]);
 }
 Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the probability of occurring at a given latitue
@@ -134,7 +134,8 @@ void Population::tick(TheWorld& w) { // does one tick of the sim
 	for (int i = 0; i < length(); i++) {
 		int key = rand() % keys.Num();
 		order[i] = keys[key];
-		keys.Remove(keys[key]);
+		TArray<int> keysTmp = keys;
+		keys.Remove(keysTmp[key]);
 	}
 	for (int i = 0; i < length(); i++) {
 		ppls[order[i]].tick(w);

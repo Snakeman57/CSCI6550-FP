@@ -21,12 +21,16 @@ public:
 		void HandleOnTextChanged(const FText& t);
 	UFUNCTION(BlueprintCallable)
 		void HandleOnTextCommitted(const FText& t, ETextCommit::Type cm);
+	UFUNCTION(BlueprintCallable)
+		void reset();
 	UPROPERTY(BlueprintReadOnly)
 		int32 num;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+		int32 dflt; // default value for resetting
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 		int32 min;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-		int32 max = INT_MAX;
+		int32 max;
 protected:
 	FText last;
 };

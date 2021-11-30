@@ -34,6 +34,9 @@ void UDisplayMainC::newSim(const int& lat1, const int& lat2, const int& size, co
 	world = new TheWorld;
 	world->init(lat1, lat2, size, pop);
 }
+void UDisplayMainC::runSim() {
+	world->tick();
+}
 FSimStats UDisplayMainC::getStats() {
 	FSimStats a;
 	WorldInfo w = world->getWstats();

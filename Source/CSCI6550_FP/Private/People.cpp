@@ -14,11 +14,11 @@ People::~People() {
 }
 void People::tick(TheWorld& w) { // does one tick of the sim
 	move(w); // where to move // desire to move to or aviod other people, desire to stay with or leave other poeole, 
-	//interact(w); // what interaction to make
-	//getSupply(w); // what to focus on: hunt (big or small game), gather, fish
+	interact(w); // what interaction to make
+	getSupply(w); // what to focus on: hunt (big or small game), gather, fish
 	eat(); // pop + trait mods
 	reproduce(); // avg birth/death ratio
-	//split(w); // 150 - 200
+	split(w); // 150 - 200
 	adjTraits(); // small random adjustments
 }
 void People::eat() {
