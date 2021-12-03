@@ -9,17 +9,21 @@
 #include "DisplayMainC.generated.h"
 
 USTRUCT(BlueprintType)
-struct FSimStats {
+struct FSimStats { // struct for simulation stats
 	GENERATED_BODY()
 public:
 	UPROPERTY(BlueprintReadOnly)
 		int locations; // number of locations
 	UPROPERTY(BlueprintReadOnly)
-		int lat1;
+		int lat1; // lower lattitude bound
 	UPROPERTY(BlueprintReadOnly)
-		int lat2; // lattitude range
+		int lat2; // upper lattitude bound
 	UPROPERTY(BlueprintReadOnly)
-		TArray<int> biomes; // number of each biomme
+		TArray<int> biomes; // number of each biome
+	UPROPERTY(BlueprintReadOnly)
+		TArray<float> pops; // average supply per biome
+	UPROPERTY(BlueprintReadOnly)
+		TArray<float> supplies; // average population per biome
 	UPROPERTY(BlueprintReadOnly)
 		float avgSupplyW; // average supply value
 	UPROPERTY(BlueprintReadOnly)
@@ -30,6 +34,8 @@ public:
 		int extinct; // number of dead Peoples
 	UPROPERTY(BlueprintReadOnly)
 		float avgSupplyP; // average supply value
+	UPROPERTY(BlueprintReadOnly)
+		int avgPop; // average population value
 	FSimStats operator =(WorldInfo& other);
 	FSimStats operator =(PopInfo& other);
 };

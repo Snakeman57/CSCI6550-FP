@@ -25,7 +25,7 @@ protected:
 //std::cout.rdbuf(&Stream);
 
 UENUM(BlueprintType)
-enum Disasters {
+enum Disasters { // 
 	quake UMETA(DisplayName = "Earthquake"),
 	volcano UMETA(DisplayName = "Volcanic Eruption"),
 	tornado UMETA(DisplayName = "Tornado"),
@@ -56,7 +56,6 @@ struct Biome {
 	Biomes name;
 	float supply; // base supply
 	FRichCurve freq; // frequency by latitute -100 to 100
-	bool coastal; // whether or not this biome has access to large bodies of water
 	float disaster[Disasters::MAX_DSTR]; // chances for natural disasters
 };
 struct Neighbor {
@@ -66,14 +65,17 @@ struct Neighbor {
 struct Location {
 	TArray<Neighbor> nbrs; // neighbors
 	Biomes biome; // biome
+	bool coastal; // whether or not this biome has access to large bodies of water
 	Weather weather; // weather
 	float supply; // supply
-	//TArray<People> p;
+	TArray<int> pop; // local population
 };
 struct WorldInfo {
 	int locations; // number of locations
 	int lat1, lat2; // lattitude range
 	int biomes[Biomes::MAX_BIOM]; // number of each biomme
+	float pops[Biomes::MAX_BIOM]; // average supply per biome
+	float supplies[Biomes::MAX_BIOM]; // average population per biome
 	float avgSupply; // average supply value
 };
 class CSCI6550_FP_API TheWorld {
@@ -84,10 +86,15 @@ public:
 	void tick(); // does one tick of the sim
 	void updtSupply(); // moves supply in each location towards base
 	void updtWeather(); // changes the weather in each location
+	void refreshStats();
 	WorldInfo getWstats() const;
 	PopInfo getPstats() const;
-	Location getLoc(int &loc);
-	void getNeighbors(int &loc, TArray<Neighbor>& n);
+	Location getLoc(int& loc);
+	People getPpl(int& ppl);
+	void getNeighbors(int& loc, TArray<Neighbor>& n);
+	void kill(int id);
+	void exploit(int loc, float s);
+	void move(int id, int loc1, int loc2);
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
 	const int bsRt; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)

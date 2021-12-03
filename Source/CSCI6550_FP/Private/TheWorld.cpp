@@ -2,7 +2,7 @@
 
 #include "TheWorld.h"
 
-TheWorld::TheWorld() : bsRt(50){ // default numbers, MUST CALL INIT BEFORE USING CLASS
+TheWorld::TheWorld() : bsRt(5){ // default numbers, MUST CALL INIT BEFORE USING CLASS
 }
 TheWorld::~TheWorld() { // dxn
 }
@@ -22,6 +22,7 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 	for (int i = 0; i < size; i++) { // generate the map
 		Location loc;
 		loc.biome = getBiome(lats[i]); // assign biome from latitude chances
+		loc.coastal = ((rand() % 10) > 0) ? false : true;
 		info.biomes[loc.biome]++;
 		loc.supply = biomes[loc.biome].supply; // assign base supply
 		int a = rand() % 6 + 1; // number of neighbors
@@ -35,16 +36,17 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 		}
 		l.Add(loc);
 	}
+	updtWeather();
 	updtSupply();
 	delete lats; // deallocate no longer needed array
 	for (int i = 0; i < pop; i++) { // populate the world
-		p.addNew(size);
+		p.addNew(*this);
 	}
 }
 void TheWorld::tick() { // does one tick of the sim
-	updtSupply();
-	updtWeather();
 	p.tick(*this);
+	updtWeather();
+	updtSupply();
 }
 void TheWorld::updtSupply() { // updates the supply value for each location
 	for (int i = 0; i < info.locations; i++) {
@@ -54,7 +56,7 @@ void TheWorld::updtSupply() { // updates the supply value for each location
 		if (l[i].supply != biomes[l[i].biome].supply) // moves supply toward biome base
 			l[i].supply += ((biomes[l[i].biome].supply / bsRt) * (((l[i].supply < biomes[l[i].biome].supply) ? 1.f : -1.f) + l[i].weather.rain + l[i].weather.temp));
 		else // randomly adjusts supply for the year from biome base
-			l[i].supply += ((biomes[l[i].biome].supply / bsRt / 2) * ((((rand() % 2) > 0) ? 1.f : -1.f) + l[i].weather.rain + l[i].weather.temp));
+			l[i].supply += ((biomes[l[i].biome].supply / bsRt / 2) * (((rand() % 2 > 0) ? 1.f : -1.f) + l[i].weather.rain + l[i].weather.temp));
 	}
 	info.avgSupply = 0;
 	for (int i = 0; i < l.Num(); i++)
@@ -68,7 +70,23 @@ void TheWorld::updtWeather() { // updates the weather for each location
 		l[i].weather.rain = bell(rngsus); // sets iedal weather modifier on a bell curve
 		l[i].weather.temp = bell(rngsus); // sets iedal temperature modifier on a bell curve
 		for (int j = 0; j < Disasters::MAX_DSTR; j++) // sets natural disasters T/F depending on likelihood in biome
-			l[i].weather.disaster[j] = ((static_cast <float> (rand()) / static_cast <float> (RAND_MAX)) < biomes[l[i].biome].disaster[j]);
+			l[i].weather.disaster[j] = (static_cast<float>(rand() / static_cast<float>(RAND_MAX)) < biomes[l[i].biome].disaster[j]);
+	}
+}
+void TheWorld::refreshStats() {
+	for (int i = 0; i < Biomes::MAX_BIOM; i++) {
+		info.pops[i] = 0.f;
+		info.supplies[i] = 0.f;
+	}
+	for (auto& i : l) {
+		info.pops[i.biome] += i.pop.Num();
+		info.supplies[i.biome] += i.supply;
+	}
+	for (int i = 0; i < Biomes::MAX_BIOM; i++) {
+		if (info.biomes[i] > 0) {
+			info.pops[i] /= /*static_cast<float>(info.biomes[i])*/p.length();
+			info.supplies[i] /= static_cast<float>(info.biomes[i]);
+		}
 	}
 }
 WorldInfo TheWorld::getWstats() const { // returns stats about the world
@@ -80,6 +98,9 @@ PopInfo TheWorld::getPstats() const { // returns stats about the population
 Location TheWorld::getLoc(int& loc) {
 	return l[loc];
 }
+People TheWorld::getPpl(int& ppl) {
+	return p.get(ppl);
+}
 void TheWorld::getNeighbors(int& loc, TArray<Neighbor>& n) {
 	for (int i = 0; i < l[loc].nbrs.Num(); i++)
 		n.Add(l[loc].nbrs[i]);
@@ -88,7 +109,7 @@ Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the prob
 	int poslat = abs(lat);
 	float max = 0;
 	float chance[Biomes::MAX_BIOM];
-	float biomeID = static_cast <float> (rand()) / static_cast <float> (RAND_MAX); // random value between 0 and 1
+	float biomeID = static_cast<float> (rand()) / static_cast<float>(RAND_MAX); // random value between 0 and 1
 	Biomes biome = Biomes::MAX_BIOM;
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) // takes the total frequency of all biomes at lat
 		max += biomes[i].freq.Eval((float)poslat);
@@ -126,18 +147,46 @@ void TheWorld::asgnBiomes() { // look into importing and store biome data
 		info.biomes[i] = 0;
 	}
 }
+void TheWorld::kill(int id) {
+	p.del(id, *this);
+}
+void TheWorld::exploit(int loc, float s) {
+	l[loc].supply -= s;
+}
+void TheWorld::move(int id, int loc1, int loc2) {
+	if (loc1 >= 0)
+		l[loc1].pop.Remove(id);
+	if (loc2 >= 0)
+		l[loc2].pop.Add(id);
+}
 // FROM POPULATION.H REQUIRING THEWORLD
+void Population::addNew(TheWorld& w) { // generate & insert
+	People ppl = People(cID, w.getWstats().locations); // generate
+	ppls.Add(cID, ppl);
+	w.move(cID, -1, ppls[cID].getLoc());
+	cID++; // update cID
+}
+void Population::clone(People& ppl, TheWorld& w) { // generate & insert
+	People cloned = People(cID, ppl); // generate
+	ppls.Add(cID, cloned);
+	w.move(cID, -1, ppls[cID].getLoc());
+	cID++; // update cID
+}
+void Population::del(int id, TheWorld& w) { // delete
+	w.move(id, ppls[id].getLoc(), -1);
+	ppls.Remove(id);
+}
 void Population::tick(TheWorld& w) { // does one tick of the sim
-	int* order = new int[length()];
+	int* order = new int[length()]; // tmp array to make ppls go in random order
 	TArray<int> keys;
-	ppls.GetKeys(keys);
-	for (int i = 0; i < length(); i++) {
+	ppls.GetKeys(keys); // collect extant ppls
+	for (int i = 0; i < length(); i++) { // fill order array
 		int key = rand() % keys.Num();
 		order[i] = keys[key];
 		TArray<int> keysTmp = keys;
 		keys.Remove(keysTmp[key]);
 	}
-	for (int i = 0; i < length(); i++) {
+	for (int i = 0; i < length(); i++) { // call tick for each ppl from order array
 		ppls[order[i]].tick(w);
 	}
 	delete order;
@@ -145,25 +194,53 @@ void Population::tick(TheWorld& w) { // does one tick of the sim
 //FROM PEOPLE.H REQUIRING THEWORLD
 void People::move(TheWorld& w) {
 	TArray<Neighbor> n;
-	w.getNeighbors(loc, n);
+	w.getNeighbors(loc, n); // collect neighbors of current location
 	int dstn = loc, dist = 0;
-	float h = w.getLoc(loc).supply;
-	for (int i = 0; i < n.Num(); i++) {
-		if (w.getLoc(n[i].loc).supply - n[i].dist > h) {
-			h = w.getLoc(n[i].loc).supply - n[i].dist;
+	float h = w.getLoc(loc).supply * (traits[Traits::glut] + 0.5) + w.getLoc(loc).pop.Num() * (traits[Traits::gregarious] - 0.5); // best location heuristic val
+	for (int i = 0; i < n.Num(); i++) { // check utility of moving to each neighbor
+		if (w.getLoc(n[i].loc).supply * (traits[Traits::glut] + 0.5) - n[i].dist * (traits[Traits::sedentary] + 0.5) + w.getLoc(n[i].loc).pop.Num() * (traits[Traits::gregarious] - 0.5) > h) {
+			h = w.getLoc(n[i].loc).supply * (traits[Traits::glut] + 0.5) - n[i].dist * (traits[Traits::sedentary] + 0.5) + w.getLoc(n[i].loc).pop.Num() * (traits[Traits::gregarious] - 0.5);
 			dstn = n[i].loc;
 			dist = n[i].dist;
 		}
 	}
-	if (dstn != loc)
+	if (dstn != loc) { // expend resources to move
 		supply -= dist * pop;
+		w.move(id, loc, dstn);
+	}
 	loc = dstn;
 }
 void People::interact(TheWorld& w) {
-
+	if (w.getLoc(loc).pop.Num() > 1 && static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::gregarious]) {
+		People tmp = w.getPpl(w.getLoc(loc).pop[rand() % w.getLoc(loc).pop.Num()]);
+		if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::trader] / (traits[Traits::trader] + traits[Traits::warrior]))
+			trade(tmp);
+		else
+			war(tmp);
+	}
 }
 void People::getSupply(TheWorld& w) {
-
+	float focus = traits[Traits::hunt] + traits[Traits::gather], s = 0; // how to divy up work
+	if (w.getLoc(loc).coastal) // only assign fishers if coastal
+		focus += traits[Traits::fish];
+	if (focus > 0) {
+		if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::game]) // hunt 
+			if (rand() % 100 > 90)
+				s += pop * (traits[Traits::hunt] / focus) * (traits[Traits::glut] + 0.5) * 10; // big game
+			else if (rand() % 100 > 50)
+				s += pop * (traits[Traits::hunt] / focus) * (traits[Traits::glut] + 0.5); // small game
+		s += pop * (traits[Traits::gather] / focus) * (traits[Traits::glut] + 0.5); // gather
+		if (w.getLoc(loc).coastal) // fish if coastal
+			s += pop * (traits[Traits::fish] / focus) * (traits[Traits::glut] + 0.5);
+		s = (s > w.getLoc(loc).supply) ? w.getLoc(loc).supply : s; // cap at available local supply
+		supply += s; // update supply
+		w.exploit(loc, s); // update supply in loc
+	}
+}
+void People::reproduce(TheWorld& w) {
+	pop *= (supply - pop) / (supply + pop) + (traits[Traits::birthRt] + 0.5) - traits[Traits::deathRt];
+	if (pop <= 0)
+		w.kill(id);
 }
 void People::split(TheWorld& w) {
 	
