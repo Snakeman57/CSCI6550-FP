@@ -1,4 +1,4 @@
-// copyright 2021 Matthew Sentell
+// Copyright 2021 Matthew Sentell
 
 #pragma once
 
@@ -77,6 +77,10 @@ struct WorldInfo {
 	float pops[Biomes::MAX_BIOM]; // average supply per biome
 	float supplies[Biomes::MAX_BIOM]; // average population per biome
 	float avgSupply; // average supply value
+	int avgPopB[Biomes::MAX_BIOM]; // average People population value per biome
+	float avgSupplyB[Biomes::MAX_BIOM]; // average People supply value per biome
+	int wars;
+	int trades;
 };
 class CSCI6550_FP_API TheWorld {
 public:
@@ -91,10 +95,13 @@ public:
 	PopInfo getPstats() const;
 	Location getLoc(int& loc);
 	People getPpl(int& ppl);
+	float getLocBase(int& loc);
 	void getNeighbors(int& loc, TArray<Neighbor>& n);
 	void kill(int id);
 	void exploit(int loc, float s);
 	void move(int id, int loc1, int loc2);
+	void clone(People& ppl);
+	void interact(bool war);
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
 	const int bsRt; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)

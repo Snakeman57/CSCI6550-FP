@@ -1,8 +1,8 @@
-// copyright 2021
+// Copyright 2021 Matthew Sentell
 
 #include "People.h"
 
-People::People(int inId, int locs) : id(inId), pop(200), supply(200), loc(rand() % locs) {
+People::People(int inId, int locs) : id(inId), pop(165), supply(165), loc(locs) {
 	for (auto& i : traits)
 		i = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
 }
@@ -22,12 +22,16 @@ void People::tick(TheWorld& w) { // does one tick of the sim
 	adjTraits(); // small random adjustments
 }
 void People::eat() {
-	supply -= pop * (traits[Traits::glut] + 0.5);
+	supply -= pop * (traits[Traits::glut] * 1.5 + 0.5);
+	if (supply < 0){
+		pop += supply * (traits[Traits::glut] * 1.5 + 0.5); // starvation
+		supply = 0;
+	}
 }
 void People::adjTraits() {
 	for (auto& a : traits) {
-		if ((static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::adapt])) // chance to change a trait
-			a += ((static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) - 0.5) * (traits[Traits::delta] + 0.5); // amt to change a trait
+		if ((static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::adapt] * 0.9 + 0.1)) // chance to change a trait
+			a += ((static_cast<float>(rand()) / static_cast<float>(RAND_MAX)) * 2 - 1) * (traits[Traits::delta] * 1.5 + 0.5); // amt to change a trait
 		a = (a > 1) ? 1 : ((a < 0) ? 0 : a); // clamp trait 0 < x < 1
 	}
 }

@@ -1,4 +1,4 @@
-// copyright 2021 Matthew Sentell
+// Copyright 2021 Matthew Sentell
 
 #pragma once
 
@@ -9,20 +9,20 @@ struct Neighbor;
 UENUM(BlueprintType)
 enum Traits {
 	glut UMETA(DisplayName = "Energy Use"), // 1 = more food aquired and eaten
-	birthRt UMETA(DisplayName = "Birth Rate"),
-	deathRt UMETA(DisplayName = "Death Rate"),
-	adapt UMETA(DisplayName = "Adaptability"),
-	delta UMETA(DisplayName = "Malleability"),
-	hunt UMETA(DisplayName = "Hunting Focus"),
-	game UMETA(DisplayName = "Preferred Game Size"),
-	gather UMETA(DisplayName = "Gathering Focus"),
-	fish UMETA(DisplayName = "Fishing Focus"),
-	sedentary UMETA(DisplayName = "Sedentariness"),
-	gregarious UMETA(DisplayName = "Preference to be around other peoples"),
-	trader UMETA(DisplayName = "Trade Intent"),
-	trading UMETA(DisplayName = "Trade Efficacy"),
-	warrior UMETA(DisplayName = "War Intent"),
-	warring UMETA(DisplayName = "War Efficacy"),
+	growthRt UMETA(DisplayName = "Growth Rate"), // 1 = faster growth
+	adapt UMETA(DisplayName = "Adaptability"), // 1 = more likely to change traits
+	delta UMETA(DisplayName = "Malleability"), // 1 = greater amt of change to traits
+	hunt UMETA(DisplayName = "Hunting Focus"), // 1 = more pop sent hunting
+	game UMETA(DisplayName = "Preferred Game Size"), // 1 = more likely to attempt big game
+	gather UMETA(DisplayName = "Gathering Focus"), // 1 = more pop sent gathering
+	fish UMETA(DisplayName = "Fishing Focus"), // 1 = more pop sent fishing
+	sedentary UMETA(DisplayName = "Sedentariness"), // 1 = more weight to distance in movement heuristic
+	gregarious UMETA(DisplayName = "Interpersonal Interaction"), // 1 = more weight to location pop in mvmt heuristic & more likely to interact
+	trader UMETA(DisplayName = "Trade Intent"), // 1 = more likely to do friendly interaction
+	trading UMETA(DisplayName = "Trade Efficacy"), // 1 = better trade outcomes
+	warrior UMETA(DisplayName = "War Intent"), // 1 = more likely to do unfriendly interaction
+	warring UMETA(DisplayName = "War Efficacy"), // 1 = better war outcomes
+	group UMETA(DisplayName = "Desired Group Size"),
 	MAX_TRAIT UMETA(Hidden)
 };
 class CSCI6550_FP_API People {

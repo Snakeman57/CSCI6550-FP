@@ -1,4 +1,4 @@
-// copyright 2021 Matthew Sentell
+// Copyright 2021 Matthew Sentell
 
 #pragma once
 
@@ -21,9 +21,9 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		TArray<int> biomes; // number of each biome
 	UPROPERTY(BlueprintReadOnly)
-		TArray<float> pops; // average supply per biome
+		TArray<float> pops; // percent Location population per biome
 	UPROPERTY(BlueprintReadOnly)
-		TArray<float> supplies; // average population per biome
+		TArray<float> supplies; // average Location supply per biome
 	UPROPERTY(BlueprintReadOnly)
 		float avgSupplyW; // average supply value
 	UPROPERTY(BlueprintReadOnly)
@@ -36,6 +36,14 @@ public:
 		float avgSupplyP; // average supply value
 	UPROPERTY(BlueprintReadOnly)
 		int avgPop; // average population value
+	UPROPERTY(BlueprintReadOnly)
+		TArray<int> avgPopB; // average People population value per biome
+	UPROPERTY(BlueprintReadOnly)
+		TArray<float> avgSupplyB; // average People supply value per biome
+	UPROPERTY(BlueprintReadOnly)
+		int wars; // total wars
+	UPROPERTY(BlueprintReadOnly)
+		int trades; // total trades
 	FSimStats operator =(WorldInfo& other);
 	FSimStats operator =(PopInfo& other);
 };

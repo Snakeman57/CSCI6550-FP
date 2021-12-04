@@ -1,4 +1,4 @@
-// copyright 2021 Matthew Sentell
+// Copyright 2021 Matthew Sentell
 
 #pragma once
 
@@ -10,8 +10,9 @@ struct PopInfo {
 	int extant;
 	int extinct;
 	float avg[Traits::MAX_TRAIT];
-	float avgSupply;
 	int avgPop;
+	float avgSupply;
+
 };
 class CSCI6550_FP_API Population {
 public:

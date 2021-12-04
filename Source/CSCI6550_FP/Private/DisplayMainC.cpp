@@ -1,5 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
-
+// Copyright 2021 Matthew Sentell
 
 #include "DisplayMainC.h"
 
@@ -12,8 +11,12 @@ FSimStats FSimStats::operator =(WorldInfo& other) { // assign world stats from s
 		biomes.Add(other.biomes[i]);
 		pops.Add(other.pops[i]);
 		supplies.Add(other.supplies[i]);
+		avgPopB.Add(other.avgPopB[i]);
+		avgSupplyB.Add(other.avgSupplyB[i]);
 	}
 	avgSupplyW = other.avgSupply;
+	trades = other.trades;
+	wars = other.wars;
 	return *this;
 }
 FSimStats FSimStats::operator =(PopInfo& other) { // assign population stats from struct

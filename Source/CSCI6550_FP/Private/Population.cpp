@@ -39,6 +39,6 @@ PopInfo Population::stats() const { // statisitcal info
 	tmp.avgPop = p; // assign average population
 	return tmp;
 }
-People Population::get(int &ppl) {
+People Population::get(int &ppl) { // public access to a People
 	return ppls[ppl];
 }
