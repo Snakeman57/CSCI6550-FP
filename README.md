@@ -1,3 +1,4 @@
 # CSCI6550_FP
 
-Developed with Unreal Engine 4
+To run the program: 
+  1. click on the executable file.
