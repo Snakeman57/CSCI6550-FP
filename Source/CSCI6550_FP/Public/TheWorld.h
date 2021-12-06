@@ -57,6 +57,7 @@ struct Biome {
 	float supply; // base supply
 	FRichCurve freq; // frequency by latitute -100 to 100
 	float disaster[Disasters::MAX_DSTR]; // chances for natural disasters
+	float aniplant; // ainmal to plant ratio
 };
 struct Neighbor {
 	int loc; // index of location being referenced
@@ -69,18 +70,20 @@ struct Location {
 	Weather weather; // weather
 	float supply; // supply
 	TArray<int> pop; // local population
+	int64 lclPop; // collected local pop of all Peoples
 };
 struct WorldInfo {
 	int locations; // number of locations
 	int lat1, lat2; // lattitude range
 	int biomes[Biomes::MAX_BIOM]; // number of each biomme
-	float pops[Biomes::MAX_BIOM]; // average supply per biome
-	float supplies[Biomes::MAX_BIOM]; // average population per biome
+	float pops[Biomes::MAX_BIOM]; // percentage population per biome
+	float supplies[Biomes::MAX_BIOM]; // average supply per biome
 	float avgSupply; // average supply value
-	int avgPopB[Biomes::MAX_BIOM]; // average People population value per biome
+	int64 avgPopB[Biomes::MAX_BIOM]; // average People population value per biome
 	float avgSupplyB[Biomes::MAX_BIOM]; // average People supply value per biome
 	int wars;
 	int trades;
+	int coastalPpls;
 };
 class CSCI6550_FP_API TheWorld {
 public:
@@ -95,7 +98,9 @@ public:
 	PopInfo getPstats() const;
 	Location getLoc(int& loc);
 	People getPpl(int& ppl);
+	int getPpls();
 	float getLocBase(int& loc);
+	float getAP(int& loc);
 	void getNeighbors(int& loc, TArray<Neighbor>& n);
 	void kill(int id);
 	void exploit(int loc, float s);
@@ -104,7 +109,6 @@ public:
 	void interact(bool war);
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
-	const int bsRt; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)
 	TArray<Location> l; // dynamically allocatable array
 	WorldInfo info; // info from l
 	Population p; // population of ppls

@@ -35,15 +35,17 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		float avgSupplyP; // average supply value
 	UPROPERTY(BlueprintReadOnly)
-		int avgPop; // average population value
+		int64 avgPop; // average population value
 	UPROPERTY(BlueprintReadOnly)
-		TArray<int> avgPopB; // average People population value per biome
+		TArray<int64> avgPopB; // average People population value per biome
 	UPROPERTY(BlueprintReadOnly)
 		TArray<float> avgSupplyB; // average People supply value per biome
 	UPROPERTY(BlueprintReadOnly)
 		int wars; // total wars
 	UPROPERTY(BlueprintReadOnly)
 		int trades; // total trades
+	UPROPERTY(BlueprintReadOnly)
+		int coastPpls; // people living in coastal areas
 	FSimStats operator =(WorldInfo& other);
 	FSimStats operator =(PopInfo& other);
 };

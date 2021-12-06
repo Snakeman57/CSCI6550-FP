@@ -12,6 +12,7 @@ enum Traits {
 	growthRt UMETA(DisplayName = "Growth Rate"), // 1 = faster growth
 	adapt UMETA(DisplayName = "Adaptability"), // 1 = more likely to change traits
 	delta UMETA(DisplayName = "Malleability"), // 1 = greater amt of change to traits
+	store UMETA(DisplayName = "Food Storage"), // 1 = store more food on hand
 	hunt UMETA(DisplayName = "Hunting Focus"), // 1 = more pop sent hunting
 	game UMETA(DisplayName = "Preferred Game Size"), // 1 = more likely to attempt big game
 	gather UMETA(DisplayName = "Gathering Focus"), // 1 = more pop sent gathering
@@ -22,7 +23,7 @@ enum Traits {
 	trading UMETA(DisplayName = "Trade Efficacy"), // 1 = better trade outcomes
 	warrior UMETA(DisplayName = "War Intent"), // 1 = more likely to do unfriendly interaction
 	warring UMETA(DisplayName = "War Efficacy"), // 1 = better war outcomes
-	group UMETA(DisplayName = "Desired Group Size"),
+	group UMETA(DisplayName = "Desired Group Size"), // 1 = larger group before splitting
 	MAX_TRAIT UMETA(Hidden)
 };
 class CSCI6550_FP_API People {
@@ -31,9 +32,10 @@ public:
 	People(int inId, People& ppl);
 	~People();
 	void tick(TheWorld& w); // defined in TheWorld.cpp
-	void merge(People& other, bool merged);
-	void win(People& other);
-	void lose(char& type);
+	void merge(People& other, bool merged, TheWorld& w);
+	void traded(float s, float t[Traits::MAX_TRAIT]);
+	void win(People& other, TheWorld& w);
+	void lose(char& type, TheWorld& w);
 	int getID() const;
 	int getLoc() const;
 	float getT(Traits t) const;
@@ -49,10 +51,10 @@ private:
 	int loc; // location index
 	void move(TheWorld& w); // defined in TheWorld.cpp
 	void interact(TheWorld& w);
-	void trade(People& other);
-	void war(People& other); // what does the victor do: release, enslave, slaughter
+	void trade(People& other, TheWorld& w);
+	void war(People& other, TheWorld& w); // what does the victor do: release, enslave, slaughter
 	void getSupply(TheWorld& w);
-	void eat();
+	void eat(TheWorld& w);
 	void reproduce(TheWorld& w);
 	void split(TheWorld& w);
 	void adjTraits();

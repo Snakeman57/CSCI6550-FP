@@ -15,6 +15,7 @@ FSimStats FSimStats::operator =(WorldInfo& other) { // assign world stats from s
 		avgSupplyB.Add(other.avgSupplyB[i]);
 	}
 	avgSupplyW = other.avgSupply;
+	coastPpls = other.coastalPpls;
 	trades = other.trades;
 	wars = other.wars;
 	return *this;

@@ -18,7 +18,7 @@ class CSCI6550_FP_API Population {
 public:
 	Population();
 	~Population();
-	void del(int id, TheWorld& w); // delete
+	void del(int& id, TheWorld& w); // delete
 	void addNew(TheWorld& w); // generate & insert
 	void clone(People& ppl, TheWorld& w); // copy & insert
 	int length() const; // public access to length
