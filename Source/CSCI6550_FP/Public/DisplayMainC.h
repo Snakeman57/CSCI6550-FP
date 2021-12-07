@@ -60,7 +60,7 @@ public:
 		FSimStats getStats();
 	UFUNCTION(BlueprintCallable)
 		void runSim();
-	UFUNCTION(Exec)
+	UFUNCTION(BlueprintCallable)
 		void safe(int s = 10000);
 protected:
 	UPROPERTY(BlueprintReadOnly)

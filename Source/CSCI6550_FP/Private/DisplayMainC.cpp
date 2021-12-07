@@ -36,7 +36,8 @@ UDisplayMainC::~UDisplayMainC() {
 	delete world;
 }
 void UDisplayMainC::newSim(const int& lat1, const int& lat2, const int& size, const int& pop) { // create new instance of the simulation
-	delete world;
+	if (world != nullptr)
+		delete world;
 	world = new TheWorld;
 	world->init(lat1, lat2, size, pop);
 	world->setSafe(safety);

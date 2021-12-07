@@ -27,7 +27,7 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 	for (int i = 0; i < size; i++) { // generate the map
 		Location loc;
 		loc.biome = getBiome(lats[i]); // assign biome from latitude chances
-		loc.coastal = (rand() % 10 < 3) ? false : true;
+		loc.coastal = (rand() % 10 < 3) ? true : false;
 		info.biomes[loc.biome]++;
 		loc.supply = biomes[loc.biome].supply; // assign base supply
 		loc.lclPop = 0;
@@ -62,7 +62,7 @@ void TheWorld::tick() { // does one tick of the sim
 	updtSupply();
 }
 void TheWorld::updtSupply() { // updates the supply value for each location
-	const int bsRt = 5; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)
+	const int bsRt = 8; // base years to recover from ecological collapse (if supply is 0 in a lcation it will take bsRt years to get back to base)
 	for (int i = 0; i < info.locations; i++) {
 		for (int j = 0; j < Disasters::MAX_DSTR; j++)
 			if (l[i].weather.disaster[j])
@@ -262,8 +262,8 @@ void People::move(TheWorld& w) {
 	int dstn = loc, dist = 0;
 	float h = (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(loc).supply * (traits[Traits::glut] * 1.5 + 0.5) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2.f - 1.f)); // best location heuristic val
 	for (int i = 0; i < n.Num(); i++) { // check utility of moving to each neighbor
-		if ((w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1) > h) {
-			h = (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1);
+		if ((w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1)) > h) {
+			h = (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1));
 			dstn = n[i].loc; // neighbor had better heuristic, update mvmt info (comment here b/c 2 lines above already long)
 			dist = n[i].dist;
 		}
