@@ -16,8 +16,8 @@ FSimStats FSimStats::operator =(WorldInfo& other) { // assign world stats from s
 	}
 	avgSupplyW = other.avgSupply;
 	coastPpls = other.coastalPpls;
-	trades = other.trades;
-	wars = other.wars;
+	for (int i = 0; i < Action::MAX_ACT; i++)
+		actions.Add(other.actions[i]);
 	return *this;
 }
 FSimStats FSimStats::operator =(PopInfo& other) { // assign population stats from struct
@@ -30,7 +30,7 @@ FSimStats FSimStats::operator =(PopInfo& other) { // assign population stats fro
 	avgPop = other.avgPop;
 	return *this;
 }
-UDisplayMainC::UDisplayMainC(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer) {
+UDisplayMainC::UDisplayMainC(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer), safety(10000) {
 }
 UDisplayMainC::~UDisplayMainC() {
 	delete world;
@@ -39,6 +39,7 @@ void UDisplayMainC::newSim(const int& lat1, const int& lat2, const int& size, co
 	delete world;
 	world = new TheWorld;
 	world->init(lat1, lat2, size, pop);
+	world->setSafe(safety);
 }
 void UDisplayMainC::runSim() { // call from tick to run one cycle of the simulation
 	world->tick();
@@ -51,4 +52,7 @@ FSimStats UDisplayMainC::getStats() { // collect and return current simulation s
 	a = w;
 	a = p;
 	return a;
+}
+void UDisplayMainC::safe(int s) {
+	safety = s;
 }

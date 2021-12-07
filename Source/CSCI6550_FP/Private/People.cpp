@@ -13,13 +13,19 @@ People::People(int inId, People& ppl) : id(inId), pop(ppl.getP()), supply(ppl.ge
 People::~People() {
 }
 void People::tick(TheWorld& w) { // does one tick of the sim
-	if(pop > 0) move(w); // where to move // desire to move to or aviod other people, desire to stay with or leave other peole, 
-	if(pop > 0) interact(w); // what interaction to make
-	if(pop > 0) getSupply(w); // what to focus on: hunt hig risk high reward or low risk low reward, gather, fish
-	if(pop > 0) eat(w); // pop * energy use
+	if(pop > 0)
+		move(w); // where to move // desire to move to or aviod other people, desire to stay with or leave other peole, 
+	if(pop > 0)
+		interact(w); // what interaction to make
+	if(pop > 0)
+		getSupply(w); // what to focus on: hunt hig risk high reward or low risk low reward, gather, fish
+	if(pop > 0)
+		eat(w); // pop * energy use
 	reproduce(w); // logistic fxn: rP(1-(P/K)); r = possible pregnancies per year * proportion of pop who can give birth * (1 - IMR);
-	if(pop > 0) split(w); // 152 - 181 size is normal
-	if (pop > 0) adjTraits(); // small random adjustments
+	if(pop > 0)
+		split(w); // 152 - 181 size is normal
+	if (pop > 0)
+		adjTraits(); // small random adjustments
 }
 void People::traded(float s, float t[Traits::MAX_TRAIT]) {
 	supply -= s; // supply exchange

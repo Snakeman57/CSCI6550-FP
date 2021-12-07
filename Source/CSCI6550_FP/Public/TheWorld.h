@@ -81,8 +81,7 @@ struct WorldInfo {
 	float avgSupply; // average supply value
 	int64 avgPopB[Biomes::MAX_BIOM]; // average People population value per biome
 	float avgSupplyB[Biomes::MAX_BIOM]; // average People supply value per biome
-	int wars;
-	int trades;
+	int actions[Action::MAX_ACT];
 	int coastalPpls;
 };
 class CSCI6550_FP_API TheWorld {
@@ -90,6 +89,8 @@ public:
 	TheWorld();
 	~TheWorld();
 	void init(const int& lat1, const int& lat2, const int& size, const int& pop);
+	int isSafe();
+	int setSafe(int s = 10000);
 	void tick(); // does one tick of the sim
 	void updtSupply(); // moves supply in each location towards base
 	void updtWeather(); // changes the weather in each location
@@ -106,7 +107,7 @@ public:
 	void exploit(int loc, float s);
 	void move(int id, int loc1, int loc2);
 	void clone(People& ppl);
-	void interact(bool war);
+	void interact(Action type);
 private:
 	Biome biomes[Biomes::MAX_BIOM]; // list of possible biomes
 	TArray<Location> l; // dynamically allocatable array
@@ -114,4 +115,5 @@ private:
 	Population p; // population of ppls
 	void asgnBiomes();
 	Biomes getBiome(int& lat) const; // returns a biome based on the probability of occurring at a given latitue
+	int safe;
 };

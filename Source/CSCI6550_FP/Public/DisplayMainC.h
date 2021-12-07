@@ -41,9 +41,7 @@ public:
 	UPROPERTY(BlueprintReadOnly)
 		TArray<float> avgSupplyB; // average People supply value per biome
 	UPROPERTY(BlueprintReadOnly)
-		int wars; // total wars
-	UPROPERTY(BlueprintReadOnly)
-		int trades; // total trades
+		TArray<int> actions; // total wars
 	UPROPERTY(BlueprintReadOnly)
 		int coastPpls; // people living in coastal areas
 	FSimStats operator =(WorldInfo& other);
@@ -62,8 +60,11 @@ public:
 		FSimStats getStats();
 	UFUNCTION(BlueprintCallable)
 		void runSim();
+	UFUNCTION(Exec)
+		void safe(int s = 10000);
 protected:
-
+	UPROPERTY(BlueprintReadOnly)
+		int32 safety; // max population size
 private:
 	TheWorld* world;
 };

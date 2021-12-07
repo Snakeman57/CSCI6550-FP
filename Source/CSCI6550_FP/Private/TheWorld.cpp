@@ -2,7 +2,7 @@
 
 #include "TheWorld.h"
 
-TheWorld::TheWorld(){ // default numbers, MUST CALL INIT BEFORE USING CLASS
+TheWorld::TheWorld() : safe(10000) { // default numbers, MUST CALL INIT BEFORE USING CLASS
 }
 TheWorld::~TheWorld() { // dxn
 }
@@ -10,9 +10,10 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 	info.locations = size;
 	info.lat1 = lat1;
 	info.lat2 = lat2;
-	info.trades = 0;
-	info.wars = 0;
 	info.coastalPpls = 0;
+	for (int i = 0; i < Action::MAX_ACT; i++) {
+		info.actions[i] = 0;
+	}
 	asgnBiomes();
 	int* lats = new int[size]; // allocate temporary array
 		std::default_random_engine rngsus;
@@ -47,6 +48,13 @@ void TheWorld::init(const int& lat1, const int& lat2, const int& size, const int
 	for (int i = 0; i < pop; i++) { // populate the world
 		p.addNew(*this);
 	}
+}
+int TheWorld::isSafe() {
+	return safe;
+}
+int TheWorld::setSafe(int s) {
+	safe = s;
+	return safe;
 }
 void TheWorld::tick() { // does one tick of the sim
 	p.tick(*this);
@@ -91,12 +99,9 @@ void TheWorld::refreshStats() { // updates expensive-to-collect stat values
 		info.pops[i.biome] += i.pop.Num();
 		info.supplies[i.biome] += i.supply;
 		info.avgPopB[i.biome] += i.lclPop;
-		//int tmp = info.avgPopB[i.biome];
 		for (auto& j : i.pop) {
-			//info.avgPopB[i.biome] += p.get(j).getP();
 			info.avgSupplyB[i.biome] += p.get(j).getS();
 		}
-		//i.lclPop = info.avgPopB[i.biome] - tmp;
 	}
 	info.avgSupply /= l.Num();
 	for (int i = 0; i < Biomes::MAX_BIOM; i++) { // get averages
@@ -154,11 +159,8 @@ void TheWorld::move(int id, int loc1, int loc2) { // store People in a location
 void TheWorld::clone(People& ppl) { // duplicate a People (used in split)
 	p.clone(ppl, *this);
 }
-void TheWorld::interact(bool war) { // update interaction counts
-	if (war)
-		info.wars++;
-	else
-		info.trades++;
+void TheWorld::interact(Action type) { // update interaction counts
+	info.actions[type]++;
 }
 Biomes TheWorld::getBiome(int& lat) const { // returns a biome based on the probability of occurring at a given latitue
 	int poslat = abs(lat);
@@ -258,10 +260,10 @@ void People::move(TheWorld& w) {
 	TArray<Neighbor> n;
 	w.getNeighbors(loc, n); // collect neighbors of current location
 	int dstn = loc, dist = 0;
-	float h = w.getLoc(loc).supply * (traits[Traits::glut] * 1.5 + 0.5) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2.f - 1.f); // best location heuristic val
+	float h = (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(loc).supply * (traits[Traits::glut] * 1.5 + 0.5) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2.f - 1.f)); // best location heuristic val
 	for (int i = 0; i < n.Num(); i++) { // check utility of moving to each neighbor
-		if (w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1) > h) {
-			h = w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1);
+		if ((w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1) > h) {
+			h = (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * (w.getLoc(loc).coastal ? (traits[Traits::fish] + 1.f) : 1.f) * w.getLoc(n[i].loc).supply * (traits[Traits::glut] * 1.5 + 0.5) - n[i].dist * (traits[Traits::sedentary] * 1.5 + 0.5) * (traits[Traits::store] + 1.f) + w.getLoc(loc).lclPop * (traits[Traits::gregarious] * 2 - 1);
 			dstn = n[i].loc; // neighbor had better heuristic, update mvmt info (comment here b/c 2 lines above already long)
 			dist = n[i].dist;
 		}
@@ -269,6 +271,7 @@ void People::move(TheWorld& w) {
 	if (dstn != loc) {
 		supply -= dist * pop * (traits[Traits::store] + 1.f); // expend resources to move
 		w.move(id, loc, dstn); // correct Location pops
+		w.interact(Action::move);
 	}
 	loc = dstn; // update Location
 }
@@ -277,21 +280,19 @@ void People::interact(TheWorld& w) { // if other ppls present, consider interact
 		People tmp = w.getPpl(w.getLoc(loc).pop[rand() % w.getLoc(loc).pop.Num()]); // decide with whom to interact
 		while (tmp == *this) // self doesn't count
 			tmp = w.getPpl(w.getLoc(loc).pop[rand() % w.getLoc(loc).pop.Num()]);
-		if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::trader] / (traits[Traits::trader] + traits[Traits::warrior])) { // decide if interaction is friendly
+		if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < traits[Traits::trader] / (traits[Traits::trader] + traits[Traits::warrior])) // decide if interaction is friendly
 			trade(tmp, w);
-			w.interact(false);
-		}
-		else { // unfriendly interaction
+		else // unfriendly interaction
 			war(tmp, w);
-			w.interact(true);
-		}
 	}
 }
 void People::trade(People& other, TheWorld& w) {
 	if (pop < other.getP() / 10 || other.getP() < pop / 10) { // is trade even practical?
+		w.interact(Action::merge);
 		merge(other, false, w);
 	}
 	else {
+		w.interact(Action::trade);
 		float s, t[Traits::MAX_TRAIT]; // temp vars to other to use later
 		s = (other.getS() - supply) * (traits[Traits::trading] / (traits[Traits::trading] + other.getT(Traits::trading))) * traits[Traits::trading]; // amount of supply to exhange
 		supply += s; // apply supply exchange
@@ -304,8 +305,11 @@ void People::trade(People& other, TheWorld& w) {
 	}
 }
 void People::war(People& other, TheWorld& w) {
-	if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < (pop * supply * traits[Traits::warring]) / (pop * supply * traits[Traits::warring] + other.getP() * other.getS() * other.getT(Traits::warring)))
+	w.interact(Action::war);
+	if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < (pop * supply * traits[Traits::warring]) / (pop * supply * traits[Traits::warring] + other.getP() * other.getS() * other.getT(Traits::warring))) {
 		win(other, w); // decide winner (comment here b/c above line is already long)
+		w.interact(Action::win);
+	}
 	else
 		other.win(*this, w);
 }
@@ -331,6 +335,7 @@ void People::win(People& other, TheWorld& w) {
 		break;
 	case'1': // enslavement
 		w.move(id, -1, loc);
+		other.lose(type, w);
 		merge(other, false, w);
 		break;
 	case'2': // genocide
@@ -357,8 +362,11 @@ void People::getSupply(TheWorld& w) { // aquires supply for the year
 		if (w.getLoc(loc).coastal) // only assign fishers if coastal
 			focus += traits[Traits::fish];
 		if (focus > 0) {
-			if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 1.f - traits[Traits::game]) // hunt success
-				s += (pop * traits[Traits::hunt] / focus) * (traits[Traits::glut] * 1.5 + 0.5) * (traits[Traits::game] * w.getAP(loc) * 2);
+			w.interact(Action::hunts);
+			if (static_cast<float>(rand()) / static_cast<float>(RAND_MAX) < 1.f - traits[Traits::game]) { // hunt success
+				s += (pop * traits[Traits::hunt] / focus) * (traits[Traits::glut] * 1.5 + 0.5) * (sqrt(traits[Traits::game]) * w.getAP(loc) * 2);
+				w.interact(Action::huntW);
+			}
 			s += (pop * traits[Traits::gather] / focus) * (traits[Traits::glut] * 1.5 + 0.5) * ((1.f - w.getAP(loc)) * 2); // gather
 			if (w.getLoc(loc).coastal) // fish if coastal
 				supply += (pop * traits[Traits::fish] / focus) * (traits[Traits::glut] * 1.5 + 0.5);
@@ -387,13 +395,19 @@ void People::reproduce(TheWorld& w) { // adjusts the population
 		w.kill(id);
 }
 void People::split(TheWorld& w) { // splits the population if large
-	if (pop > (traits[Traits::group] * 29.f + 152.f) * (traits[Traits::sedentary] + 1.f) && w.getPpls() < 10000) { // chance to split increases with pop to max at periodic aggregation size
+	if (pop > (traits[Traits::group] * 29.f + 152.f) * (traits[Traits::sedentary] + 1.f) && ((w.isSafe() > 0) ? (w.getPpls() < w.isSafe()) : true)) { // chance to split increases with pop to max at periodic aggregation size
+		w.interact(Action::splits);
 		w.move(id, loc, -1); // prep to account for int math
-		pop /= 10; // drop pop
-		supply /= 10; // drop supply
+		float tmp = 1.f / pop;
+		pop *= traits[Traits::split] * (0.5 - tmp) + tmp; // drop pop
+		if (pop < 1)
+			pop = 1;
+		supply *= traits[Traits::split] * (0.5 - tmp) + tmp; // drop supply
 		w.clone(*this); // split
-		pop *= 9; // restore pop
-		supply *= 9; // restore supply
+		pop *= 1 / (traits[Traits::split] * (0.5 - tmp) + tmp); // restore pop
+		pop -= pop * (traits[Traits::split] * (0.5 - tmp) + tmp);
+		supply *= 1 / (traits[Traits::split] * (0.5 - tmp) + tmp); // restore supply
+		supply -= supply * (traits[Traits::split] * (0.5 - tmp) + tmp);
 		w.move(id, -1, loc); // account for int math
 	}
 }
